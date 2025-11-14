@@ -4,21 +4,10 @@ using UnityEngine.SceneManagement;
 
 public class PauseMenuUI : MonoBehaviour
 {
-    public static PauseMenuUI instance { get; private set; }
     public static bool isGamePause = false;
 
     [SerializeField] GameObject PauseUI;
-    void Awake()
-    {
-        if (instance == null)
-        {
-            instance = this;
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
-    }
+    
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Escape))

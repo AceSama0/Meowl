@@ -144,7 +144,7 @@ public class Player : MonoBehaviour
         if (collision.gameObject.CompareTag("Key")) // anahtar
         {
             Destroy(collision.gameObject);
-            LevelManager.instance.keys[LevelManager.instance.keyIndex] = true;
+            // LevelManager.instance.keys[LevelManager.instance.keyIndex] = true;
             keyValue++;
 
             if (keyValue == 5)
@@ -152,11 +152,13 @@ public class Player : MonoBehaviour
                 GameManager.instance.doorBool = true;
             }
         }
-        if (collision.gameObject.CompareTag("Door") && GameManager.instance.doorBool) // kapı
-        {
-            GameManager.instance.NextScene();
+        // if (collision.gameObject.CompareTag("Door")) //&& GameManager.instance.doorBool) // kapı
+        // {
+        //     // GameManager.instance.NextScene();
+        //     GameManagerNew.Instance.isTouchingDoor = true;
+        //     // GameObject door = 
 
-        }
+        // }
 
         if (collision.gameObject.CompareTag("Enemy"))
         {
