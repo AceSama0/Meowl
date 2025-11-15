@@ -14,6 +14,7 @@ public class GameManagerNew : MonoBehaviour
     [SerializeField] GameObject kitchenVision;
     [SerializeField] GameObject corridorVision;
     [SerializeField] Camera camera1;
+    [SerializeField] GameObject InventoryUI;
     
     void Awake()
     {
