@@ -3,22 +3,62 @@ using UnityEngine.EventSystems;
 
 public class ItemDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
+    Transform originalParent;
+    CanvasGroup canvasGroup;
     void Start()
     {
-        
+        canvasGroup = GetComponent<CanvasGroup>();
     }
     public void OnBeginDrag(PointerEventData eventData)
     {
-        throw new System.NotImplementedException();
-    }
+        originalParent = transform.parent;
+        transform.SetParent(transform.root);
+        canvasGroup.blocksRaycasts = false;
+        canvasGroup.alpha = 0.6f;
 
-    public void OnEndDrag(PointerEventData eventData)
-    {
-        throw new System.NotImplementedException();
     }
 
     public void OnDrag(PointerEventData eventData)
     {
-        throw new System.NotImplementedException();
+        transform.position = eventData.position;
+    }
+
+    public void OnEndDrag(PointerEventData eventData)
+    {
+        canvasGroup.blocksRaycasts = true;
+        canvasGroup.alpha = 1f;
+        SlotScripts dropSlot = eventData.pointerEnter?.GetComponent<SlotScripts>();
+        if (dropSlot == null)
+        {
+            GameObject dropItem = eventData.pointerEnter;
+            if (dropItem != null)
+            {
+                dropSlot = dropItem.GetComponentInParent<SlotScripts>();
+            }
+        }
+        SlotScripts originalSlot = originalParent.GetComponent<SlotScripts>();
+
+        if (dropSlot != null)
+        {
+            if (dropSlot.currentImage != null)
+            {
+                dropSlot.currentImage.transform.SetParent(originalSlot.transform);
+                originalSlot.currentImage = dropSlot.currentImage;
+                dropSlot.currentImage.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
+            }
+            else
+            {
+                originalSlot.currentImage = null;
+            }
+
+            transform.SetParent(dropSlot.transform);
+            dropSlot.currentImage = gameObject;
+        }
+        else
+        {
+            transform.SetParent(originalParent);
+        }
+
+        GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
     }
 }

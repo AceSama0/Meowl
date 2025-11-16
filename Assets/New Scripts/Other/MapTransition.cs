@@ -41,6 +41,7 @@ public class MapTransition : MonoBehaviour
         }
 
         player.transform.position = playerPos;
+        
     }
 
 }

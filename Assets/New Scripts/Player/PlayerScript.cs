@@ -23,7 +23,6 @@ public class Player : MonoBehaviour
 
     public float lightTime;
     [Header("Puzzle")]
-    private int keyValue = 0;
     [SerializeField] Vector2 movement;
     [SerializeField] float speed = 5f; 
     [SerializeField] public int fuels = 0;
@@ -53,7 +52,6 @@ public class Player : MonoBehaviour
     }
     void Update()
     {
-
         playerMovement();
         LightOnOff();
     }
@@ -136,37 +134,9 @@ public class Player : MonoBehaviour
             Destroy(collision.gameObject);
         }
 
-        if (collision.gameObject.CompareTag("Table")) //masa etkileşimi
-        {
-            // GameManager.instance.canvas = true;
-        }
-
-        if (collision.gameObject.CompareTag("Key")) // anahtar
-        {
-            Destroy(collision.gameObject);
-            // LevelManager.instance.keys[LevelManager.instance.keyIndex] = true;
-            keyValue++;
-
-            if (keyValue == 5)
-            {
-                GameManager.instance.doorBool = true;
-            }
-        }
-        // if (collision.gameObject.CompareTag("Door")) //&& GameManager.instance.doorBool) // kapı
-        // {
-        //     // GameManager.instance.NextScene();
-        //     GameManagerNew.Instance.isTouchingDoor = true;
-        //     // GameObject door = 
-
-        // }
-
         if (collision.gameObject.CompareTag("Enemy"))
         {
             SceneManager.LoadScene("KızÖlüm");
-        }
-        if (collision.gameObject.CompareTag("Drawer"))
-        {
-            UIManager.instance.activateDialogue = true;
         }
     }
 
