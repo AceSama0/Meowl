@@ -8,3 +8,4 @@ public class SaveData
     public string mapBoundary;
     public List<InventorySaveData> InventorySaveData;
 }
+

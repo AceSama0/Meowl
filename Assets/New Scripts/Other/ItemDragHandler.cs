@@ -3,7 +3,7 @@ using UnityEngine.EventSystems;
 
 public class ItemDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
-    Transform originalParent;
+    public Transform originalParent;
     CanvasGroup canvasGroup;
     void Start()
     {
@@ -26,9 +26,11 @@ public class ItemDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
     {
         canvasGroup.blocksRaycasts = true;
         canvasGroup.alpha = 1f;
+        
         SlotScripts dropSlot = eventData.pointerEnter?.GetComponent<SlotScripts>();
         if (dropSlot == null)
         {
+            // transform.localScale = Vector3.one;
             GameObject dropItem = eventData.pointerEnter;
             if (dropItem != null)
             {

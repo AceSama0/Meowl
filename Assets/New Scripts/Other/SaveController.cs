@@ -9,6 +9,7 @@ public class SaveController : MonoBehaviour
     void Start()
     {
         saveLocation = Path.Combine(Application.persistentDataPath, "savaData.json");
+        Debug.Log("" + saveLocation);
         InventoryController = FindAnyObjectByType<InventoryController>();
         LoadGame();
 

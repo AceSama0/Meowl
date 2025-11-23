@@ -3,6 +3,7 @@ using UnityEngine;
 public class PuzzleActivateCode : MonoBehaviour
 {
     public GameObject PuzzleName;
+    [SerializeField] private PuzzleSetSlots puzzleSetSlots; // Inspector'dan atayın
 
     void Start()
     {
@@ -14,9 +15,32 @@ public class PuzzleActivateCode : MonoBehaviour
         if (collision.CompareTag("Player"))
         {
             PuzzleName.SetActive(true);
-            Pause();
+            OnPuzzlePanelOpen();
+            // Pause();
         }
     }
+
+    
+    
+    void OnPuzzlePanelOpen()
+    {
+        // Null kontrolü ekleyin
+        if (puzzleSetSlots == null)
+        {
+            puzzleSetSlots = FindAnyObjectByType<PuzzleSetSlots>();
+            Debug.LogWarning("PuzzleSetSlots Inspector'dan atanmamış, FindAnyObjectByType ile bulundu");
+        }
+        
+        if (puzzleSetSlots != null)
+        {
+            puzzleSetSlots.RefreshPuzzleDisplay();
+        }
+        else
+        {
+            Debug.LogError("PuzzleSetSlots bulunamadı!");
+        }
+    }
+
 
     public void Resume()
     {
@@ -32,7 +56,7 @@ public class PuzzleActivateCode : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             PuzzleName.SetActive(false);
-            Resume();
+            // Resume();
         }
     }
 }
