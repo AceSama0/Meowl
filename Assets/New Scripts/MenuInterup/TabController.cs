@@ -20,5 +20,18 @@ public class TabController : MonoBehaviour
 
         pages[tabNo].SetActive(true);
         tabs[tabNo].color = Color.white;
+
+    }
+
+    public void ActivateLetters(int tabNo)
+    {
+        for (int i = 0; i < tabs.Length; i++)
+        {
+            pages[i].SetActive(false);
+            tabs[i].color = Color.grey;
+        }
+
+        pages[tabNo].SetActive(true);
+        tabs[tabNo].color = Color.white;
     }
 }
