@@ -3,11 +3,13 @@ using UnityEngine;
 public class PuzzleActivateCode : MonoBehaviour
 {
     public GameObject PuzzleName;
-    [SerializeField] private PuzzleSetSlots puzzleSetSlots; // Inspector'dan atayın
+    [SerializeField] private PuzzleSetSlots puzzleSetSlots;
+    InventoryScript inventoryScript;
 
     void Start()
     {
         PuzzleName.SetActive(false);
+        inventoryScript = FindAnyObjectByType<InventoryScript>();
     }
 
     void OnTriggerEnter2D(Collider2D collision)
@@ -16,6 +18,8 @@ public class PuzzleActivateCode : MonoBehaviour
         {
             PuzzleName.SetActive(true);
             OnPuzzlePanelOpen();
+            inventoryScript.isAnotherScreenOpened = true;
+
             // Pause();
         }
     }
@@ -41,22 +45,15 @@ public class PuzzleActivateCode : MonoBehaviour
         }
     }
 
-
-    public void Resume()
-    {
-        Time.timeScale = 1f;
-    }
-    void Pause()
-    {
-        Time.timeScale = 0f;
-    }
-
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             PuzzleName.SetActive(false);
+            inventoryScript.isAnotherScreenOpened = false;
+
             // Resume();
         }
     }
+    //Çalıştırıldığında diğer yerlere haber ver
 }

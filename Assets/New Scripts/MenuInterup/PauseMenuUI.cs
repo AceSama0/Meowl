@@ -1,16 +1,23 @@
+using NUnit.Framework;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class PauseMenuUI : MonoBehaviour
 {
-    public static bool isGamePause = false;
+    public bool isGamePause = false;
 
     [SerializeField] GameObject PauseUI;
-    
+    InventoryScript inventoryScript;
+
+    void Awake()
+    {
+        inventoryScript = FindAnyObjectByType<InventoryScript>();
+    }
+
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Escape))
+        if (Input.GetKeyDown(KeyCode.Escape) && !inventoryScript.isAnotherScreenOpened)
         {
             if (isGamePause)
             {
@@ -34,6 +41,7 @@ public class PauseMenuUI : MonoBehaviour
         PauseUI.SetActive(true);
         Time.timeScale = 0f;
         isGamePause = true;
+
     }
     public void Menu()
     {
