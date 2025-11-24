@@ -3,9 +3,10 @@ using UnityEngine;
 public class Enemy : MonoBehaviour
 {
     Rigidbody2D rb;
-    [SerializeField] float movementSpeed = 2f;
+    public float movementSpeed = 2f;
     Vector2 moveDirection;
     Transform target;
+    public float originalSpeed {get; private set;}
 
     void Awake()
     {
@@ -14,6 +15,7 @@ public class Enemy : MonoBehaviour
     void Start()
     {
         target = FindAnyObjectByType<Player>().transform;
+        originalSpeed = movementSpeed;  
     }
 
     void Update()
@@ -30,5 +32,11 @@ public class Enemy : MonoBehaviour
         {
             rb.linearVelocity = new Vector2(moveDirection.x, moveDirection.y) * movementSpeed;
         }
+    }
+
+    public bool ChangedRoom()
+    {
+
+        return true;
     }
 }

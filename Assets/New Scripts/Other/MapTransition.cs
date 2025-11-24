@@ -4,6 +4,8 @@ using Unity.VisualScripting;
 using UnityEngine;
 public class MapTransition : MonoBehaviour
 {
+    Enemy enemy;
+    SpriteRenderer enemysprite;
     [Header("MapChange")]
     [SerializeField] GameObject maptoActivate;
     [SerializeField] GameObject maptoDeactivate;
@@ -23,9 +25,12 @@ public class MapTransition : MonoBehaviour
 
     void Awake()
     {
+        enemy = FindAnyObjectByType<Enemy>();
         confiner = FindAnyObjectByType<CinemachineConfiner2D>();    
         camera1 = FindAnyObjectByType<Camera>();
+        enemysprite = enemy.GetComponent<SpriteRenderer>();
     }
+
     void OnTriggerEnter2D(Collider2D collision)
     {
         if(collision.gameObject.CompareTag("Player"))
@@ -34,6 +39,13 @@ public class MapTransition : MonoBehaviour
             SetCamera();
             confiner.BoundingShape2D = mapBoundry;
             UpdatePlayerPosition(collision.gameObject);
+            enemysprite.enabled = !enemysprite.enabled;
+
+        }
+        else if(collision.CompareTag("Enemy"))
+        {
+            UpdatePlayerPosition(collision.gameObject);
+            enemysprite.enabled = true;
         }
     }
 

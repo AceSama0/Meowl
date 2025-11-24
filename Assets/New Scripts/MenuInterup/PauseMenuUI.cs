@@ -36,7 +36,7 @@ public class PauseMenuUI : MonoBehaviour
         Time.timeScale = 1f;
         isGamePause = false;
     }
-    void Pause()
+    public void Pause()
     {
         PauseUI.SetActive(true);
         Time.timeScale = 0f;

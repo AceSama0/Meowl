@@ -19,8 +19,7 @@ public class PuzzleActivateCode : MonoBehaviour
             PuzzleName.SetActive(true);
             OnPuzzlePanelOpen();
             inventoryScript.isAnotherScreenOpened = true;
-
-            // Pause();
+            Pause();
         }
     }
 
@@ -45,14 +44,22 @@ public class PuzzleActivateCode : MonoBehaviour
         }
     }
 
+    void Pause()
+    {
+        Time.timeScale = 0f;
+    }
+    void Resume()
+    {
+        Time.timeScale = 1f;
+    }
+
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             PuzzleName.SetActive(false);
             inventoryScript.isAnotherScreenOpened = false;
-
-            // Resume();
+            Resume();
         }
     }
     //Çalıştırıldığında diğer yerlere haber ver
