@@ -45,7 +45,7 @@ public class MapTransition : MonoBehaviour
         else if(collision.CompareTag("Enemy"))
         {
             UpdatePlayerPosition(collision.gameObject);
-            enemysprite.enabled = true;
+            enemysprite.enabled = !enemysprite.enabled;
         }
     }
 

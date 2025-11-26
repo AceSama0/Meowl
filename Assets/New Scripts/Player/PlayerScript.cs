@@ -134,10 +134,10 @@ public class Player : MonoBehaviour
             Destroy(collision.gameObject);
         }
 
-        // if (collision.gameObject.CompareTag("Enemy"))
-        // {
-        //     SceneManager.LoadScene("KızÖlüm");
-        // }
+        if (collision.gameObject.CompareTag("Enemy"))
+        {
+            SceneManager.LoadScene("KızÖlüm");
+        }
     }
 
     IEnumerator RightHandLight(Light2D lantern)

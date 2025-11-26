@@ -1,10 +1,9 @@
-using NUnit.Framework;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class PauseMenuUI : MonoBehaviour
 {
+    public static PauseMenuUI instance { get; private set; }
     public bool isGamePause = false;
 
     [SerializeField] GameObject PauseUI;
@@ -12,6 +11,15 @@ public class PauseMenuUI : MonoBehaviour
 
     void Awake()
     {
+        if (instance == null)
+        {
+            instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+
         inventoryScript = FindAnyObjectByType<InventoryScript>();
     }
 
@@ -29,6 +37,7 @@ public class PauseMenuUI : MonoBehaviour
             }
         }
     }
+
 
     public void Resume()
     {

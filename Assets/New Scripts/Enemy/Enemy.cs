@@ -6,7 +6,9 @@ public class Enemy : MonoBehaviour
     public float movementSpeed = 2f;
     Vector2 moveDirection;
     Transform target;
-    public float originalSpeed {get; private set;}
+    public float originalSpeed { get; private set; }
+
+
 
     void Awake()
     {
@@ -15,7 +17,7 @@ public class Enemy : MonoBehaviour
     void Start()
     {
         target = FindAnyObjectByType<Player>().transform;
-        originalSpeed = movementSpeed;  
+        originalSpeed = movementSpeed;
     }
 
     void Update()
@@ -28,15 +30,14 @@ public class Enemy : MonoBehaviour
     }
     void FixedUpdate()
     {
-        if(target)
+        if (target)
         {
             rb.linearVelocity = new Vector2(moveDirection.x, moveDirection.y) * movementSpeed;
         }
     }
 
-    public bool ChangedRoom()
+    void ChangeRoom()
     {
 
-        return true;
     }
 }

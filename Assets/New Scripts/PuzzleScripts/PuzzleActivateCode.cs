@@ -19,7 +19,6 @@ public class PuzzleActivateCode : MonoBehaviour
             PuzzleName.SetActive(true);
             OnPuzzlePanelOpen();
             inventoryScript.isAnotherScreenOpened = true;
-            Pause();
         }
     }
 
@@ -27,39 +26,25 @@ public class PuzzleActivateCode : MonoBehaviour
     
     void OnPuzzlePanelOpen()
     {
-        // Null kontrolü ekleyin
         if (puzzleSetSlots == null)
         {
             puzzleSetSlots = FindAnyObjectByType<PuzzleSetSlots>();
-            Debug.LogWarning("PuzzleSetSlots Inspector'dan atanmamış, FindAnyObjectByType ile bulundu");
         }
         
         if (puzzleSetSlots != null)
         {
             puzzleSetSlots.RefreshPuzzleDisplay();
         }
-        else
-        {
-            Debug.LogError("PuzzleSetSlots bulunamadı!");
-        }
     }
 
-    void Pause()
-    {
-        Time.timeScale = 0f;
-    }
-    void Resume()
-    {
-        Time.timeScale = 1f;
-    }
+    
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Escape))
+        if (Input.GetKeyDown(KeyCode.Escape) && inventoryScript.isAnotherScreenOpened)
         {
             PuzzleName.SetActive(false);
             inventoryScript.isAnotherScreenOpened = false;
-            Resume();
         }
     }
     //Çalıştırıldığında diğer yerlere haber ver

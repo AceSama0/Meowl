@@ -4,10 +4,9 @@ public class InventoryScript : MonoBehaviour
 {
     [SerializeField] GameObject InventoryUI;
     public bool isAnotherScreenOpened = false;
-    PauseMenuUI pauseMenuUI;
+    [SerializeField]PauseMenuUI pauseMenuUI;
     void Start()
     {
-        pauseMenuUI = FindAnyObjectByType<PauseMenuUI>();
         InventoryUI.SetActive(false);
     }
 
