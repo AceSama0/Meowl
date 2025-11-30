@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using Unity.Cinemachine;
 using Unity.VisualScripting;
@@ -5,30 +6,42 @@ using UnityEngine;
 public class MapTransition : MonoBehaviour
 {
     Enemy enemy;
+    Player player;
     SpriteRenderer enemysprite;
     [Header("MapChange")]
     [SerializeField] GameObject maptoActivate;
     [SerializeField] GameObject maptoDeactivate;
-    [SerializeField] bool SetCineMachine ;
-    
+    [SerializeField] Transform cameraPos;
+
+    [Header("FadeOut")]
+    [SerializeField] GameObject Animation;    
     [Header("Camera")]
-    private Camera camera1;
-    [SerializeField] GameObject cineMachine;
+    
     [SerializeField] float cameraSize;
     private CinemachineConfiner2D confiner;
+    private CinemachineCamera vCam;
     [Header("BoundryChange")]
     [SerializeField] PolygonCollider2D mapBoundry;
-    [SerializeField]Direction direction;
     [SerializeField]float transformInt; 
     [SerializeField] Vector3 cameraPosition;
+    [SerializeField]Direction direction;
     enum Direction{Up,Down,Left,Right}
 
     void Awake()
     {
+        vCam = FindAnyObjectByType<CinemachineCamera>();
         enemy = FindAnyObjectByType<Enemy>();
+        player = FindAnyObjectByType<Player>();
         confiner = FindAnyObjectByType<CinemachineConfiner2D>();    
-        camera1 = FindAnyObjectByType<Camera>();
-        enemysprite = enemy.GetComponent<SpriteRenderer>();
+        vCam.Follow = cameraPos;
+        if(enemy == null)
+        {
+            return;
+        }
+        else
+        {
+            enemysprite = enemy.GetComponent<SpriteRenderer>();
+        }
     }
 
     void OnTriggerEnter2D(Collider2D collision)
@@ -36,7 +49,7 @@ public class MapTransition : MonoBehaviour
         if(collision.gameObject.CompareTag("Player"))
         {
             MapChange();
-            SetCamera();
+            StartCoroutine(TransitionEffect());
             confiner.BoundingShape2D = mapBoundry;
             UpdatePlayerPosition(collision.gameObject);
             enemysprite.enabled = !enemysprite.enabled;
@@ -58,14 +71,19 @@ public class MapTransition : MonoBehaviour
         if (maptoActivate != null)
         {
             maptoActivate.SetActive(true);
-            cineMachine.SetActive(SetCineMachine);
+            // vCam.enabled = SetCineMachine;
+            vCam.Follow = cameraPos;
         }
     }
 
-    void SetCamera()
+    IEnumerator TransitionEffect()
     {
-        camera1.transform.position = cameraPosition;
-        camera1.orthographicSize = cameraSize;
+        float currentSpeed = player.speed;
+        Animation.SetActive(true);
+        player.speed = 0;
+        yield return new WaitForSeconds(1);
+        Animation.SetActive(false);
+        player.speed = currentSpeed;
     }
     
     void UpdatePlayerPosition(GameObject player)

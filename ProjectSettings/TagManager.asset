@@ -13,6 +13,8 @@ TagManager:
   - Key
   - Enemy
   - Item
+  - PuzzleSlot
+  - QTE
   layers:
   - Default
   - TransparentFX

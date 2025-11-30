@@ -5,7 +5,7 @@ public class ItemDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
 {
     public Transform originalParent;
     CanvasGroup canvasGroup;
-    void Start()
+    void Awake()
     {
         canvasGroup = GetComponent<CanvasGroup>();
     }
@@ -26,11 +26,11 @@ public class ItemDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
     {
         canvasGroup.blocksRaycasts = true;
         canvasGroup.alpha = 1f;
-        
+
         SlotScripts dropSlot = eventData.pointerEnter?.GetComponent<SlotScripts>();
         if (dropSlot == null)
         {
-            // transform.localScale = Vector3.one;
+            transform.localScale = Vector3.one;
             GameObject dropItem = eventData.pointerEnter;
             if (dropItem != null)
             {
@@ -54,7 +54,19 @@ public class ItemDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
 
             transform.SetParent(dropSlot.transform);
             dropSlot.currentImage = gameObject;
+            
+            if (dropSlot.CompareTag("PuzzleSlot"))
+            {
+                PuzzleController puzzleController = FindAnyObjectByType<PuzzleController>();
+                {
+                    if (puzzleController != null)
+                    {
+                        puzzleController.CheckPuzzleStatus();
+                    }
+                }
+            }
         }
+        
         else
         {
             transform.SetParent(originalParent);

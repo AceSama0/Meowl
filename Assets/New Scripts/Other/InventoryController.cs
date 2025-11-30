@@ -47,6 +47,27 @@ public class InventoryController : MonoBehaviour
         }
         return invData;
     }
+    public bool HideItem(int itemID)
+    {
+        foreach (Transform slotTransform in inventoryPanel.transform)
+        {
+            SlotScripts slot = slotTransform.GetComponent<SlotScripts>();
+
+            if (slot != null && slot.currentImage != null)
+            {
+                Item item = slot.currentImage.GetComponent<Item>();
+
+                if (item != null && item.ID == itemID)
+                {
+                    slot.currentImage.SetActive(false);
+                
+                    Debug.Log($"Item ID {itemID} ana envanterden puzzle için gizlendi.");
+                    return true; 
+                }
+            }
+        }
+        return false;
+    }
 
     public void SetIventortyItems(List<InventorySaveData> inventorySaveData)
     {

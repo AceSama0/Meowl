@@ -24,7 +24,7 @@ public class Player : MonoBehaviour
     public float lightTime;
     [Header("Puzzle")]
     [SerializeField] Vector2 movement;
-    [SerializeField] float speed = 5f; 
+    public float speed = 5f; 
     [SerializeField] public int fuels = 0;
 
     [SerializeField] Rigidbody2D rb;

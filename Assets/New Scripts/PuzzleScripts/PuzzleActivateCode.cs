@@ -16,28 +16,32 @@ public class PuzzleActivateCode : MonoBehaviour
     {
         if (collision.CompareTag("Player"))
         {
-            PuzzleName.SetActive(true);
+            if (PuzzleName != null)
+            {
+
+                PuzzleName.SetActive(true);
+            }
             OnPuzzlePanelOpen();
             inventoryScript.isAnotherScreenOpened = true;
         }
     }
 
-    
-    
+
+
     void OnPuzzlePanelOpen()
     {
         if (puzzleSetSlots == null)
         {
             puzzleSetSlots = FindAnyObjectByType<PuzzleSetSlots>();
         }
-        
+
         if (puzzleSetSlots != null)
         {
             puzzleSetSlots.RefreshPuzzleDisplay();
         }
     }
 
-    
+
 
     void Update()
     {
