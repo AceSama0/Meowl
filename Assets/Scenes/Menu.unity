@@ -232,11 +232,11 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 54373952}
-  m_Father: {fileID: 1534711502}
+  m_Father: {fileID: 1823375282}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -0.000045776156, y: -202}
+  m_AnchoredPosition: {x: 0.000015259, y: -112}
   m_SizeDelta: {x: 374.43, y: 86.4246}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &477229819
@@ -284,7 +284,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1823375284}
-        m_TargetAssemblyTypeName: Credits, Assembly-CSharp
+        m_TargetAssemblyTypeName: MainMenuScript, Assembly-CSharp
         m_MethodName: CreditsScene
         m_Mode: 1
         m_Arguments:
@@ -558,7 +558,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 'Secret Redemption
+  m_Text: 'Gaslit Eye
 
 '
 --- !u!222 &903600078
@@ -817,7 +817,6 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1424431823}
-  - {fileID: 477229818}
   m_Father: {fileID: 1823375282}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -869,8 +868,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1823375283}
-        m_TargetAssemblyTypeName: StartScript, Assembly-CSharp
+      - m_Target: {fileID: 1823375284}
+        m_TargetAssemblyTypeName: MainMenuScript, Assembly-CSharp
         m_MethodName: StartGame
         m_Mode: 1
         m_Arguments:
@@ -1017,6 +1016,7 @@ RectTransform:
   m_Children:
   - {fileID: 648940980}
   - {fileID: 1534711502}
+  - {fileID: 477229818}
   - {fileID: 1940883417}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1046,7 +1046,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1823375278}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ee8ae2d7a102b3f4ba387f199fba2667, type: 3}
+  m_Script: {fileID: 11500000, guid: cd9f327df61f5c64ba21ca7d214d061d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &1940883416
@@ -1133,9 +1133,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1940883421}
-        m_TargetAssemblyTypeName: QuitScript, Assembly-CSharp
-        m_MethodName: Quit
+      - m_Target: {fileID: 1823375284}
+        m_TargetAssemblyTypeName: MainMenuScript, Assembly-CSharp
+        m_MethodName: ExitGame
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

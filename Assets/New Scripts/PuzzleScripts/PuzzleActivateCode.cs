@@ -5,13 +5,14 @@ public class PuzzleActivateCode : MonoBehaviour
     public GameObject PuzzleName;
     [SerializeField] private PuzzleSetSlots puzzleSetSlots;
     InventoryScript inventoryScript;
+    PauseMenuUI pause;
 
     void Start()
     {
+        pause = FindAnyObjectByType<PauseMenuUI>();
         PuzzleName.SetActive(false);
         inventoryScript = FindAnyObjectByType<InventoryScript>();
     }
-
     void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.CompareTag("Player"))
@@ -25,9 +26,6 @@ public class PuzzleActivateCode : MonoBehaviour
             inventoryScript.isAnotherScreenOpened = true;
         }
     }
-
-
-
     void OnPuzzlePanelOpen()
     {
         if (puzzleSetSlots == null)
@@ -40,12 +38,10 @@ public class PuzzleActivateCode : MonoBehaviour
             puzzleSetSlots.RefreshPuzzleDisplay();
         }
     }
-
-
-
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Escape) && inventoryScript.isAnotherScreenOpened)
+        
+        if (Input.GetKeyDown(KeyCode.Escape) && inventoryScript.isAnotherScreenOpened && !pause.isGamePause)
         {
             PuzzleName.SetActive(false);
             inventoryScript.isAnotherScreenOpened = false;

@@ -1,53 +1,79 @@
 using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 enum State
 {
     Chase,
     Roam,
+    Search,
+    Dash,
     Flee,
-
+    Die,
 }
 public class EnemyBehave : MonoBehaviour
 {
     Player player;
+    public Vector2 lastSeen;
     Enemy enemy;
+    
+    [SerializeField] Transform spawnPoint;
+    [SerializeField] float waitingTime;
     WayPointMover wayPointMover;
     State state;
     Rigidbody2D rb;
+
+    
+
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         player = FindAnyObjectByType<Player>();
-        state = State.Roam;
-    }
-    void Start()
-    {
         enemy = GetComponent<Enemy>();
         wayPointMover = GetComponent<WayPointMover>();
+        state = State.Roam;
     }
+    
     void Update()
     {
-        if (ChaseDistance() < 10f && SeesPlayer())
+        if (ChaseDistance() < 5f && SeesPlayer() && enemy.canDash)
+        {
+            state = State.Dash;
+        }
+
+        else if (ChaseDistance() < 10f && SeesPlayer())
         {
             state = State.Chase;
+            lastSeen = player.transform.position;
         }
+
         else
         {
             state = State.Roam;
         }
+
         switch (state)
         {
             case State.Roam:
                 enemy.enabled = false;
                 wayPointMover.enabled = true;
+                enemy.canDash = true;
                 break;
             case State.Chase:
                 enemy.enabled = true;
                 wayPointMover.enabled = false;
                 break;
+            case State.Dash:
+                break;
+                
+            case State.Flee:
+                break;
+            case State.Die:
+                break;
+            
         }
     }
-    
+
     float ChaseDistance()
     {
         return Vector2.Distance(transform.position, player.transform.position);
@@ -75,35 +101,13 @@ public class EnemyBehave : MonoBehaviour
         }
     }
 
-    IEnumerator QuickTimeEvent()
+    
+    IEnumerator Waiting()
     {
-
-        Time.timeScale = 0.8f;
-        enemy.movementSpeed = 5f;
-        enemy.enabled = true;
-        float qteDureation = 3f;
-        bool success = false;
-        while (qteDureation > 0)
-        {
-            if (Input.GetKeyDown(KeyCode.E))
-            {
-                success = true;
-                break;
-            }
-
-            yield return null;
-
-        }
-
-        Time.timeScale = 1f;
-
-        if (success)
-        {
-            enemy.enabled = false;
-            Debug.Log("Başarılı");
-            yield return new WaitForSeconds(5f);
-            state = State.Roam;
-        }
+        float oldSpeed = enemy.movementSpeed;
+        enemy.movementSpeed = 0f;
+        yield return new WaitForSeconds(waitingTime);
+        enemy.movementSpeed = oldSpeed;
     }
-
+    
 }

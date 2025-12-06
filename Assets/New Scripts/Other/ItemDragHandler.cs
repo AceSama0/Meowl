@@ -1,18 +1,30 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
+using System.Collections;
 
 public class ItemDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
-    public Transform originalParent;
-    CanvasGroup canvasGroup;
+    private Transform originalParent;
+    private CanvasGroup canvasGroup;
+    private RectTransform rectTransform;
+
     void Awake()
     {
         canvasGroup = GetComponent<CanvasGroup>();
+        rectTransform = GetComponent<RectTransform>();
+        
+        if (canvasGroup == null)
+        {
+            canvasGroup = gameObject.AddComponent<CanvasGroup>();
+        }
     }
+
     public void OnBeginDrag(PointerEventData eventData)
     {
         originalParent = transform.parent;
         transform.SetParent(transform.root);
+        transform.SetAsLastSibling();
+        
         canvasGroup.blocksRaycasts = false;
         canvasGroup.alpha = 0.6f;
     }
@@ -27,51 +39,114 @@ public class ItemDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
         canvasGroup.blocksRaycasts = true;
         canvasGroup.alpha = 1f;
 
-        SlotScripts dropSlot = eventData.pointerEnter?.GetComponent<SlotScripts>();
-        if (dropSlot == null)
+        // Drop edilen slotu bul
+        SlotScripts dropSlot = null;
+        
+        if (eventData.pointerEnter != null)
         {
-            transform.localScale = Vector3.one;
-            GameObject dropItem = eventData.pointerEnter;
-            if (dropItem != null)
+            dropSlot = eventData.pointerEnter.GetComponent<SlotScripts>();
+            
+            if (dropSlot == null)
             {
-                dropSlot = dropItem.GetComponentInParent<SlotScripts>();
+                dropSlot = eventData.pointerEnter.GetComponentInParent<SlotScripts>();
             }
         }
-        SlotScripts originalSlot = originalParent.GetComponent<SlotScripts>();
 
-        if (dropSlot != null)
+        SlotScripts originalSlot = originalParent?.GetComponent<SlotScripts>();
+
+        // Aynı slot'a mı bırakıldı?
+        if (dropSlot == originalSlot)
         {
-            if (dropSlot.currentImage != null)
+            transform.SetParent(originalParent);
+            FitItemToSlot();
+            return;
+        }
+
+        // ✅ GEÇERLİ BİR SLOT'A BIRAKILDIYSA
+        if (dropSlot != null && originalSlot != null)
+        {
+            GameObject dropSlotItem = dropSlot.currentImage;
+
+            // 🔄 DROP SLOT DOLU MU? → SWAP
+            if (dropSlotItem != null && dropSlotItem != gameObject)
             {
-                dropSlot.currentImage.transform.SetParent(originalSlot.transform);
-                originalSlot.currentImage = dropSlot.currentImage;
-                dropSlot.currentImage.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
+                // 1. Drop slot'taki item'ı al ve original slot'a yerleştir
+                dropSlotItem.transform.SetParent(originalSlot.transform);
+                originalSlot.currentImage = dropSlotItem;
+                
+                RectTransform swappedRect = dropSlotItem.GetComponent<RectTransform>();
+                if (swappedRect != null)
+                {
+                    swappedRect.anchoredPosition = Vector2.zero;
+                    swappedRect.sizeDelta = originalSlot.GetComponent<RectTransform>().sizeDelta * 0.9f;
+                    swappedRect.localScale = Vector3.one;
+                }
+
+                // 2. Sürüklenen item'ı drop slot'a yerleştir
+                transform.SetParent(dropSlot.transform);
+                dropSlot.currentImage = gameObject;
+                FitItemToSlot();
             }
+            // 📭 DROP SLOT BOŞ → TAŞI
             else
             {
-                originalSlot.currentImage = null;
+                // Original slot'u temizle
+                if (originalSlot.currentImage == gameObject)
+                {
+                    originalSlot.currentImage = null;
+                }
+
+                // Drop slot'a yerleştir
+                transform.SetParent(dropSlot.transform);
+                dropSlot.currentImage = gameObject;
+                FitItemToSlot();
             }
 
-            transform.SetParent(dropSlot.transform);
-            dropSlot.currentImage = gameObject;
-            
-            if (dropSlot.CompareTag("PuzzleSlot"))
+            // 🧩 PUZZLE KONTROLÜ - BİR FRAME SONRA! (KRİTİK!)
+            if (dropSlot.CompareTag("PuzzleSlot") || originalSlot.CompareTag("PuzzleSlot"))
             {
-                PuzzleController puzzleController = FindAnyObjectByType<PuzzleController>();
-                {
-                    if (puzzleController != null)
-                    {
-                        puzzleController.CheckPuzzleStatus();
-                    }
-                }
+                StartCoroutine(CheckPuzzleDelayed());
             }
         }
-        
+        // ❌ GEÇERSİZ YER → GERİ DÖN
         else
         {
             transform.SetParent(originalParent);
+            FitItemToSlot();
         }
+    }
 
-        GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
+    // 🔥 KRİTİK: Bir frame bekle, sonra kontrol et
+    IEnumerator CheckPuzzleDelayed()
+    {
+        // Unity'nin tüm transform değişikliklerini tamamlaması için bekle
+        yield return null;
+
+        PuzzleController puzzleController = FindAnyObjectByType<PuzzleController>();
+        if (puzzleController != null)
+        {
+            puzzleController.CheckPuzzleStatus();
+        }
+    }
+
+    void FitItemToSlot()
+    {
+        if (rectTransform == null) return;
+
+        SlotScripts parentSlot = transform.parent?.GetComponent<SlotScripts>();
+        if (parentSlot == null) return;
+
+        RectTransform slotRect = parentSlot.GetComponent<RectTransform>();
+        if (slotRect == null) return;
+
+        // Anchor ve pivot ayarla
+        rectTransform.anchorMin = new Vector2(0.5f, 0.5f);
+        rectTransform.anchorMax = new Vector2(0.5f, 0.5f);
+        rectTransform.pivot = new Vector2(0.5f, 0.5f);
+        
+        // Pozisyon ve boyut
+        rectTransform.anchoredPosition = Vector2.zero;
+        rectTransform.sizeDelta = slotRect.sizeDelta * 0.9f; // Slot boyutunun %90'ı
+        rectTransform.localScale = Vector3.one;
     }
 }

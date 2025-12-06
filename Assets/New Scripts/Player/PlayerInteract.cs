@@ -5,25 +5,30 @@ public class PlayerInteract : MonoBehaviour
 {
     private RaycastHit2D hit;
     [SerializeField] private float interactDistance;
+    public bool interacting = false;
 
     public enum FacingDirection { Right, Left, Up, Down }
     public FacingDirection currentDirection = FacingDirection.Right;
-    
+
 
     void Update()
     {
         SetCurrentDirection();
         Vector2 direction = GetDirection();
-        hit = Physics2D.Raycast(transform.position, direction , interactDistance , LayerMask.GetMask("Collectable"));
-        // Debug.DrawRay()
+        hit = Physics2D.Raycast(transform.position, direction, interactDistance, LayerMask.GetMask("Interactable"));
+        // Debug.DrawRay(transform.position, direction, 2f)
         if (hit.collider != null)
         {
-            GameObject item = hit.collider.gameObject;
+            
+            // GameObject item = hit.collider.gameObject;
 
-            if (Input.GetKeyUp(KeyCode.E))
+            if (Input.GetKeyDown(KeyCode.E))
             {
-                Debug.Log(item.name);
-                Destroy(item);
+                interacting = true;
+            }
+            else
+            {
+                interacting = false;
             }
         }
     }

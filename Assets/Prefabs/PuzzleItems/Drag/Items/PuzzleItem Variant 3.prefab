@@ -11,7 +11,7 @@ PrefabInstance:
     - target: {fileID: 33808558839109574, guid: 7a8f243228af85649a0b41429ed7b6f3, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: -7049460874815310564, guid: d436f9306d1867c44b4d0c5c013fcb7e, type: 3}
+      objectReference: {fileID: -8813512993246199862, guid: d436f9306d1867c44b4d0c5c013fcb7e, type: 3}
     - target: {fileID: 1189220227331015084, guid: 7a8f243228af85649a0b41429ed7b6f3, type: 3}
       propertyPath: m_Name
       value: PuzzleItem Variant 3
@@ -99,6 +99,10 @@ PrefabInstance:
     - target: {fileID: 6061351860219891464, guid: 7a8f243228af85649a0b41429ed7b6f3, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7726649345879017558, guid: 7a8f243228af85649a0b41429ed7b6f3, type: 3}
+      propertyPath: ID
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 7726649345879017558, guid: 7a8f243228af85649a0b41429ed7b6f3, type: 3}
       propertyPath: Name

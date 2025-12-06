@@ -1,6 +1,6 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
-public class Credits : MonoBehaviour
+public class CreditsS : MonoBehaviour
 {
     public void CreditsScene()
     {

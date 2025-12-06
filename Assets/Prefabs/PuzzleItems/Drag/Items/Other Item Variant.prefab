@@ -13,6 +13,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: -5728686177044832811, guid: b1f24b3bc2e2f1d4b858657ad5c115a0, type: 3}
     - target: {fileID: -3380552589626630339, guid: ba3530899fe63464380d490e7fd1033c, type: 3}
+      propertyPath: ID
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: -3380552589626630339, guid: ba3530899fe63464380d490e7fd1033c, type: 3}
       propertyPath: Name
       value: Banana
       objectReference: {fileID: 0}

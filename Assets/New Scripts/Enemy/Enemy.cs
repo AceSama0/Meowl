@@ -1,12 +1,21 @@
+using System.Collections;
 using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
+
     Rigidbody2D rb;
     public float movementSpeed = 2f;
     Vector2 moveDirection;
     Transform target;
     public float originalSpeed { get; private set; }
+
+    [Header("Dash")]
+    public bool canDash = true;
+    [SerializeField] bool isDashing;
+    [SerializeField] float dashingDuration = 0.1f;
+    [SerializeField] float dashingSpeed;
+    [SerializeField] float dashCoolDown = 0.1f;
 
 
 
@@ -22,22 +31,40 @@ public class Enemy : MonoBehaviour
 
     void Update()
     {
+        if (isDashing)
+        {
+            return;
+        }
         if (target)
         {
             Vector3 direction = (target.transform.position - transform.position).normalized;
             moveDirection = direction;
         }
+        if (Vector2.Distance(target.position, transform.position) < 10f && canDash)
+        {
+            StartCoroutine(Dash());
+        }
     }
     void FixedUpdate()
     {
+        if (isDashing)
+        {
+            return;
+        }
         if (target)
         {
             rb.linearVelocity = new Vector2(moveDirection.x, moveDirection.y) * movementSpeed;
         }
     }
-
-    void ChangeRoom()
+    IEnumerator Dash()
     {
-
+        // ses çal
+        canDash = false;
+        isDashing = true;
+        rb.linearVelocity = new Vector2(moveDirection.x, moveDirection.y) * dashingSpeed;
+        yield return new WaitForSeconds(dashingDuration);
+        isDashing = false;
+        yield return new WaitForSeconds(dashCoolDown);
+        
     }
 }

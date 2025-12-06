@@ -6,7 +6,7 @@ public class PuzzleSetSlots : MonoBehaviour
 {
     private ItemDictionary itemDictionary;
     private InventoryController inventoryController;
-    [SerializeField] GameObject PuzzlePieces; 
+    [SerializeField] GameObject PuzzlePieces;
     [SerializeField] GameObject slotPrefab;
     [SerializeField] int slotCount;
     [SerializeField] int[] requiredItemIDs;
@@ -25,31 +25,31 @@ public class PuzzleSetSlots : MonoBehaviour
             itemDictionary = FindAnyObjectByType<ItemDictionary>();
         if (inventoryController == null)
             inventoryController = FindAnyObjectByType<InventoryController>();
-        
+
         RefreshPuzzleDisplay();
     }
 
     void OnDisable()
     {
         CancelInvoke(nameof(RefreshPuzzleDisplay));
-        ClearAllItems(); 
+        ClearAllItems();
     }
 
 
     public void RefreshPuzzleDisplay()
     {
-        if (inventoryController == null || itemDictionary == null) 
+        if (inventoryController == null || itemDictionary == null)
         {
             Debug.LogError("Manager referansları eksik!");
             return;
         }
 
-        
-        ClearAllItems(); 
+
+        ClearAllItems();
 
         Transform puzzleSlotContainer = PuzzlePieces.transform;
         List<InventorySaveData> currentInventory = inventoryController.GetInventoryItems();
-        if (currentInventory == null) return; 
+        if (currentInventory == null) return;
 
         for (int i = 0; i < requiredItemIDs.Length && i < puzzleSlotContainer.childCount; i++)
         {
@@ -60,22 +60,21 @@ public class PuzzleSetSlots : MonoBehaviour
 
             if (itemFoundInInventory)
             {
-                if (inventoryController.HideItem(requiredID))
+
+
+                GameObject itemPrefab = itemDictionary.GetItemPrefab(requiredID);
+                if (itemPrefab != null)
                 {
-                    GameObject itemPrefab = itemDictionary.GetItemPrefab(requiredID);
+                    GameObject item = Instantiate(itemPrefab, targetSlot);
+                    RectTransform rectTransform = item.GetComponent<RectTransform>();
 
-                    if (itemPrefab != null)
+                    if (rectTransform != null)
                     {
-                        GameObject item = Instantiate(itemPrefab, targetSlot);
-                        RectTransform rectTransform = item.GetComponent<RectTransform>();
-
-                        if (rectTransform != null)
-                        {
-                            rectTransform.anchoredPosition = Vector2.zero;
-                            rectTransform.localScale = Vector3.one;
-                        }
+                        rectTransform.anchoredPosition = Vector2.zero;
+                        rectTransform.localScale = Vector3.one;
                     }
                 }
+
             }
         }
     }
@@ -85,22 +84,22 @@ public class PuzzleSetSlots : MonoBehaviour
         {
             Destroy(PuzzlePieces.transform.GetChild(i).gameObject);
         }
-        yield return null; 
+        yield return null;
 
         for (int i = 0; i < slotCount; i++)
         {
             Instantiate(slotPrefab, PuzzlePieces.transform);
         }
 
-        yield return null; 
+        yield return null;
         RefreshPuzzleDisplay();
     }
 
-    
+
 
     private void ClearAllItems()
     {
-        
+
         Transform puzzleSlotContainer = PuzzlePieces.transform;
         for (int i = 0; i < puzzleSlotContainer.childCount; i++)
         {
@@ -111,7 +110,7 @@ public class PuzzleSetSlots : MonoBehaviour
             }
         }
     }
-    
+
     public bool CheckForCorrectItem(SlotScripts targetSlot, int requiredItemID)
     {
         if (targetSlot.currentImage == null)

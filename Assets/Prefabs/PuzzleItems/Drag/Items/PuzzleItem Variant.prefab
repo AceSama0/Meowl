@@ -13,6 +13,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: -4092149821824468057, guid: d436f9306d1867c44b4d0c5c013fcb7e, type: 3}
     - target: {fileID: -3380552589626630339, guid: ba3530899fe63464380d490e7fd1033c, type: 3}
+      propertyPath: ID
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: -3380552589626630339, guid: ba3530899fe63464380d490e7fd1033c, type: 3}
       propertyPath: Name
       value: PuzzleItem1
       objectReference: {fileID: 0}
@@ -50,11 +54,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7940251415578400867, guid: ba3530899fe63464380d490e7fd1033c, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 100
+      value: 16
       objectReference: {fileID: 0}
     - target: {fileID: 7940251415578400867, guid: ba3530899fe63464380d490e7fd1033c, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 100
+      value: 16
       objectReference: {fileID: 0}
     - target: {fileID: 7940251415578400867, guid: ba3530899fe63464380d490e7fd1033c, type: 3}
       propertyPath: m_LocalPosition.x

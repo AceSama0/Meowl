@@ -8,8 +8,11 @@ using UnityEngine.SceneManagement;
 
 public class Player : MonoBehaviour
 {
+    Enemy enemy;
     private Coroutine activeCoroutine;
     public static Player instance { get; private set; }
+    [Header("QTE")]
+    
     [Header("Lantern")]
     [SerializeField] Transform[] lightWayPoints = new Transform[3];
     [SerializeField] int lightWPIndex = 3;
@@ -46,6 +49,7 @@ public class Player : MonoBehaviour
 
     void Start()
     {
+        enemy = FindAnyObjectByType<Enemy>();
         lantern.transform.position = lightWayPoints[0].position;
         lantern.pointLightInnerRadius = 5f;
         StartCoroutine(switchingLight());    
@@ -54,6 +58,7 @@ public class Player : MonoBehaviour
     {
         playerMovement();
         LightOnOff();
+        
     }
     
 
@@ -140,6 +145,8 @@ public class Player : MonoBehaviour
         }
     }
 
+    
+
     IEnumerator RightHandLight(Light2D lantern)
     {
         if (lightWPIndex < 0) { lightWPIndex = 0; }
@@ -185,6 +192,8 @@ public class Player : MonoBehaviour
             yield return new WaitForSeconds(5);
         }
     }
+
+    
     
 
 }

@@ -79,11 +79,14 @@ public class MapTransition : MonoBehaviour
     IEnumerator TransitionEffect()
     {
         float currentSpeed = player.speed;
+        float EnemyCurrentSpeed = enemy.movementSpeed;
         Animation.SetActive(true);
         player.speed = 0;
+        enemy.movementSpeed = 0;
         yield return new WaitForSeconds(1);
         Animation.SetActive(false);
         player.speed = currentSpeed;
+        enemy.movementSpeed = EnemyCurrentSpeed;
     }
     
     void UpdatePlayerPosition(GameObject player)
