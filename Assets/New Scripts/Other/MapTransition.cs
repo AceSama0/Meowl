@@ -1,12 +1,17 @@
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Cinemachine;
+using Unity.Mathematics;
 using Unity.VisualScripting;
 using UnityEngine;
 public class MapTransition : MonoBehaviour
 {
     Enemy enemy;
     Player player;
+    WayPointMover wayPointMover;
+    public bool isPlayerInside;
+    [SerializeField] bool corridorBool;
+    bool successed;
     SpriteRenderer enemysprite;
     [Header("MapChange")]
     [SerializeField] GameObject maptoActivate;
@@ -14,27 +19,27 @@ public class MapTransition : MonoBehaviour
     [SerializeField] Transform cameraPos;
 
     [Header("FadeOut")]
-    [SerializeField] GameObject Animation;    
+    [SerializeField] GameObject Animation;
     [Header("Camera")]
-    
+
     [SerializeField] float cameraSize;
     private CinemachineConfiner2D confiner;
     private CinemachineCamera vCam;
     [Header("BoundryChange")]
     [SerializeField] PolygonCollider2D mapBoundry;
-    [SerializeField]float transformInt; 
+    [SerializeField] float transformInt;
     [SerializeField] Vector3 cameraPosition;
-    [SerializeField]Direction direction;
-    enum Direction{Up,Down,Left,Right}
+    [SerializeField] Direction direction;
+    enum Direction { Up, Down, Left, Right }
 
     void Awake()
     {
         vCam = FindAnyObjectByType<CinemachineCamera>();
         enemy = FindAnyObjectByType<Enemy>();
         player = FindAnyObjectByType<Player>();
-        confiner = FindAnyObjectByType<CinemachineConfiner2D>();    
+        confiner = FindAnyObjectByType<CinemachineConfiner2D>();
         vCam.Follow = cameraPos;
-        if(enemy == null)
+        if (enemy == null)
         {
             return;
         }
@@ -46,34 +51,49 @@ public class MapTransition : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D collision)
     {
-        if(collision.gameObject.CompareTag("Player"))
+        if (collision.gameObject.CompareTag("Player"))
         {
             MapChange();
             StartCoroutine(TransitionEffect());
             confiner.BoundingShape2D = mapBoundry;
             UpdatePlayerPosition(collision.gameObject);
             enemysprite.enabled = !enemysprite.enabled;
-
+            StartCoroutine(LockedDoor());
         }
-        else if(collision.CompareTag("Enemy"))
+        else if (collision.CompareTag("Enemy"))
         {
-            UpdatePlayerPosition(collision.gameObject);
-            enemysprite.enabled = !enemysprite.enabled;
+            if (corridorBool || !isPlayerInside)
+            {
+                UpdatePlayerPosition(collision.gameObject);
+                enemysprite.enabled = !enemysprite.enabled;
+            }
+            else if (isPlayerInside)
+            {
+                StartCoroutine(TryOpennigDoor());
+            }
+
         }
     }
 
-    void MapChange()
+
+    IEnumerator TryOpennigDoor()
     {
-        if (maptoDeactivate != null)
+        wayPointMover = enemy.GetComponent<WayPointMover>();
+        float zeroSpeed = wayPointMover.movementSpeed;
+        wayPointMover.movementSpeed = 0; // kapı sesi gelmeye başlar
+        yield return new WaitForSeconds(3);
+        wayPointMover.currentWayPointIndex += 5;
+        if (wayPointMover.currentWayPointIndex > wayPointMover.wayPoints.Length)
         {
-            maptoDeactivate.SetActive(false);
+            wayPointMover.currentWayPointIndex = 0;
         }
-        if (maptoActivate != null)
-        {
-            maptoActivate.SetActive(true);
-            // vCam.enabled = SetCineMachine;
-            vCam.Follow = cameraPos;
-        }
+        wayPointMover.movementSpeed = zeroSpeed;
+    }
+
+    IEnumerator LockedDoor()
+    {
+        yield return new WaitForSeconds(5);
+        isPlayerInside = true;
     }
 
     IEnumerator TransitionEffect()
@@ -88,7 +108,20 @@ public class MapTransition : MonoBehaviour
         player.speed = currentSpeed;
         enemy.movementSpeed = EnemyCurrentSpeed;
     }
-    
+    void MapChange()
+    {
+        if (maptoDeactivate != null)
+        {
+            maptoDeactivate.SetActive(false);
+        }
+        if (maptoActivate != null)
+        {
+            maptoActivate.SetActive(true);
+            // vCam.enabled = SetCineMachine;
+            vCam.Follow = cameraPos;
+        }
+    }
+
     void UpdatePlayerPosition(GameObject player)
     {
         Vector3 playerPos = player.transform.position;
@@ -110,7 +143,7 @@ public class MapTransition : MonoBehaviour
         }
 
         player.transform.position = playerPos;
-        
+
     }
 
 }

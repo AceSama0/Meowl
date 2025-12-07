@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -16,14 +17,15 @@ public class EnemyBehave : MonoBehaviour
     Player player;
     public Vector2 lastSeen;
     Enemy enemy;
-    
+    bool hasFled = false;
+
     [SerializeField] Transform spawnPoint;
     [SerializeField] float waitingTime;
     WayPointMover wayPointMover;
     State state;
     Rigidbody2D rb;
 
-    
+
 
     void Awake()
     {
@@ -33,10 +35,14 @@ public class EnemyBehave : MonoBehaviour
         wayPointMover = GetComponent<WayPointMover>();
         state = State.Roam;
     }
-    
+
     void Update()
     {
-        if (ChaseDistance() < 5f && SeesPlayer() && enemy.canDash)
+        if (ChaseDistance() < 10f&& SeesPlayer() && player.lightTime > 0)
+        {
+            state = State.Flee;
+        }
+        else if (ChaseDistance() < 5f && SeesPlayer() && enemy.canDash)
         {
             state = State.Dash;
         }
@@ -55,6 +61,7 @@ public class EnemyBehave : MonoBehaviour
         switch (state)
         {
             case State.Roam:
+                hasFled = false;
                 enemy.enabled = false;
                 wayPointMover.enabled = true;
                 enemy.canDash = true;
@@ -65,12 +72,24 @@ public class EnemyBehave : MonoBehaviour
                 break;
             case State.Dash:
                 break;
-                
+
             case State.Flee:
+                if (!hasFled)
+                {
+                    enemy.enabled = false;
+                    wayPointMover.currentWayPointIndex -= 3; 
+                    if (wayPointMover.currentWayPointIndex < 0)
+                    {
+                        wayPointMover.currentWayPointIndex = 0;
+                    }
+                    wayPointMover.enabled = true;
+                    hasFled = true;
+                }
                 break;
+
             case State.Die:
                 break;
-            
+
         }
     }
 
@@ -101,7 +120,7 @@ public class EnemyBehave : MonoBehaviour
         }
     }
 
-    
+
     IEnumerator Waiting()
     {
         float oldSpeed = enemy.movementSpeed;
@@ -109,5 +128,5 @@ public class EnemyBehave : MonoBehaviour
         yield return new WaitForSeconds(waitingTime);
         enemy.movementSpeed = oldSpeed;
     }
-    
+
 }

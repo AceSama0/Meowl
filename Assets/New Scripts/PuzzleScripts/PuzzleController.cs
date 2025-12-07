@@ -6,6 +6,7 @@ public class PuzzleController : MonoBehaviour
 
     [SerializeField] private SlotScripts[] allPuzzleSlots;
     [SerializeField] GameObject puzzle;
+    [SerializeField] PuzzleSlotVerifier [] puzzleSlotVerifiers;
     public void CheckPuzzleStatus()
     {
         StartCoroutine(RunCheckDelayed());

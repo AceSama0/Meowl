@@ -4,20 +4,13 @@ using UnityEngine;
 public class WayPointMover : MonoBehaviour
 {
     [SerializeField] Transform wayPointParent;
-    Enemy enemy;
-    Player player;
-    [SerializeField] float movementSpeed = 2f;
+    [SerializeField]public float movementSpeed = 2f;
     [SerializeField] float waitTime = 1f;
     public bool loopWayPoints = true;
-    [SerializeField] Transform[] wayPoints;
-    private int currentWayPointIndex;
+    [SerializeField]public Transform[] wayPoints;
+    public int currentWayPointIndex;
     private bool isWaiting;
-    void Awake()
-    {
     
-        enemy = GetComponent<Enemy>();
-        player = FindAnyObjectByType<Player>();
-    }
     void Start()
     {
         wayPoints = new Transform[wayPointParent.childCount];
@@ -31,18 +24,6 @@ public class WayPointMover : MonoBehaviour
     void Update()
     {
         Roam();
-        // if (SeesPlayer())
-        // {
-        //     loopWayPoints = false;
-        //     enemy.enabled = true;
-        // }
-        // else
-        // {
-        //     loopWayPoints = true;
-        //     MoveToWayPoint();
-        //     enemy.enabled = false;
-        // }
-
     }
 
     public void Roam()
@@ -64,7 +45,6 @@ public class WayPointMover : MonoBehaviour
             StartCoroutine(WaitAtWayPoint());
         }
     }
-
 
     IEnumerator WaitAtWayPoint()
     {
