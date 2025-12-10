@@ -16,12 +16,9 @@ public class PlayerInteract : MonoBehaviour
         SetCurrentDirection();
         Vector2 direction = GetDirection();
         hit = Physics2D.Raycast(transform.position, direction, interactDistance, LayerMask.GetMask("Interactable"));
-        // Debug.DrawRay(transform.position, direction, 2f)
+        // Debug.DrawRay(transform.position, direction,Color.red ,2f);
         if (hit.collider != null)
         {
-            
-            // GameObject item = hit.collider.gameObject;
-
             if (Input.GetKeyDown(KeyCode.E))
             {
                 interacting = true;

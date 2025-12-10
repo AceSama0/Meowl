@@ -8,11 +8,12 @@ using UnityEngine.SceneManagement;
 
 public class Player : MonoBehaviour
 {
+    bool idleing;
     Enemy enemy;
+    public bool canMove = true;
+    float basicSpeed;
     private Coroutine activeCoroutine;
     public static Player instance { get; private set; }
-    [Header("QTE")]
-    
     [Header("Lantern")]
     [SerializeField] Transform[] lightWayPoints = new Transform[3];
     [SerializeField] int lightWPIndex = 3;
@@ -27,7 +28,7 @@ public class Player : MonoBehaviour
     public float lightTime;
     [Header("Puzzle")]
     [SerializeField] Vector2 movement;
-    public float speed = 5f; 
+    public float speed = 5f;
     [SerializeField] public int fuels = 0;
 
     [SerializeField] Rigidbody2D rb;
@@ -45,6 +46,7 @@ public class Player : MonoBehaviour
         {
             Destroy(gameObject);
         }
+        basicSpeed = speed;
     }
 
     void Start()
@@ -52,15 +54,23 @@ public class Player : MonoBehaviour
         enemy = FindAnyObjectByType<Enemy>();
         lantern.transform.position = lightWayPoints[0].position;
         lantern.pointLightInnerRadius = 5f;
-        StartCoroutine(switchingLight());    
+        StartCoroutine(switchingLight());
     }
     void Update()
     {
+        if (canMove)
+        {
+            speed = basicSpeed;
+        }
+        else
+        {
+            speed = 0;
+        }
         playerMovement();
         LightOnOff();
-        
+
     }
-    
+
 
     void LightOnOff()
     {
@@ -112,10 +122,12 @@ public class Player : MonoBehaviour
         if (inputX != 0 || inputY != 0)
         {
             animator.SetBool("isWalking", true);
+            idleing = false;
         }
         else
         {
             animator.SetBool("isWalking", false);
+            idleing = true;
         }
 
         if (inputX == -1)
@@ -145,12 +157,12 @@ public class Player : MonoBehaviour
         }
     }
 
-    
+
 
     IEnumerator RightHandLight(Light2D lantern)
     {
         if (lightWPIndex < 0) { lightWPIndex = 0; }
-        while (lightWPIndex <= lightWayPoints.Length-1)
+        while (lightWPIndex <= lightWayPoints.Length - 1)
         {
             lantern.transform.position = Vector2.MoveTowards(lantern.transform.position, lightWayPoints[lightWPIndex].position, 2f * Time.deltaTime);
             if (Vector2.Distance(lantern.transform.position, lightWayPoints[lightWPIndex].position) < 0.01f)
@@ -176,24 +188,28 @@ public class Player : MonoBehaviour
     }
     IEnumerator switchingLight()
     {
-        while (true)
+        if (idleing)
         {
-            if (activeCoroutine != null)
+            while (true)
             {
-                StopCoroutine(activeCoroutine);
+                if (activeCoroutine != null)
+                {
+                    StopCoroutine(activeCoroutine);
+                }
+                animator.SetBool("SwitchingLantern", true);
+                activeCoroutine = StartCoroutine(RightHandLight(lantern));
+                yield return new WaitForSeconds(5);
+                animator.SetBool("SwitchingLantern", false);
+                if (activeCoroutine != null)
+                {
+                    StopCoroutine(activeCoroutine);
+                }
+                activeCoroutine = StartCoroutine(LeftHandLight(lantern));
+                animator.SetBool("SwitchingLantern", true);
+                yield return new WaitForSeconds(5);
+                animator.SetBool("SwitchingLantern", false);
             }
-            activeCoroutine = StartCoroutine(RightHandLight(lantern));
-            yield return new WaitForSeconds(5);
-            if (activeCoroutine != null)
-            {
-                StopCoroutine(activeCoroutine);
-            }
-            activeCoroutine = StartCoroutine(LeftHandLight(lantern));   
-            yield return new WaitForSeconds(5);
         }
+
     }
-
-    
-    
-
 }

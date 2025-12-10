@@ -3,22 +3,41 @@ using UnityEngine;
 
 public class PuzzleController : MonoBehaviour
 {
-
     [SerializeField] private SlotScripts[] allPuzzleSlots;
     [SerializeField] GameObject puzzle;
-    [SerializeField] PuzzleSlotVerifier [] puzzleSlotVerifiers;
+    private InventoryScript inventoryScript;
+    void Start()
+    {
+        inventoryScript = FindAnyObjectByType<InventoryScript>();
+    }
+
+    private bool EnsureSlotsAreLoaded()
+    {
+        if (allPuzzleSlots == null || allPuzzleSlots.Length == 0)
+        {
+            allPuzzleSlots = GetComponentsInChildren<SlotScripts>(true); 
+        }
+        
+        if (allPuzzleSlots == null || allPuzzleSlots.Length == 0)
+        {
+            Debug.LogError($"SLOT HATASI: {gameObject.name} için puzzle slotları bulunamadı! Hierarchy kontrol edin.");
+            return false;
+        }
+        return true;
+    }
+
     public void CheckPuzzleStatus()
     {
         StartCoroutine(RunCheckDelayed());
     }
+
     private IEnumerator RunCheckDelayed()
     {
+        yield return null; 
+        yield return null; 
 
-        yield return null;
-
-        if (allPuzzleSlots == null || allPuzzleSlots.Length == 0)
+        if (!EnsureSlotsAreLoaded())
         {
-            Debug.LogError("HATA: Puzzle slotları atanmamış!");
             yield break;
         }
 
@@ -26,10 +45,16 @@ public class PuzzleController : MonoBehaviour
 
         foreach (SlotScripts slot in allPuzzleSlots)
         {
-
             PuzzleSlotVerifier rules = slot.GetComponent<PuzzleSlotVerifier>();
 
-            if (rules == null || !rules.VerifyItemRule())
+            if (rules == null)
+            {
+                 Debug.LogError($"KRİTİK HATA: {slot.name} üzerinde PuzzleSlotVerifier yok!");
+                 isPuzzleSolved = false;
+                 break;
+            }
+
+            if (!rules.VerifyItemRule())
             {
                 isPuzzleSolved = false;
                 break;
@@ -38,15 +63,19 @@ public class PuzzleController : MonoBehaviour
 
         if (isPuzzleSolved)
         {
-
-            Debug.Log("Yanlış yok");
-            puzzle.SetActive(false);
+            // Debug.Log("Yanlış yok");
+            
+            if (puzzle != null)
+            {
+                inventoryScript.isAnotherScreenOpened = false;
+                puzzle.SetActive(false);
+                
+            }
             Destroy(this);
-
         }
         else
         {
-            Debug.Log("Yanlış var");
+            // Debug.Log("Yanlış var");
         }
     }
 }

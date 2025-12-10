@@ -12,7 +12,7 @@ public class ItemDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
     {
         canvasGroup = GetComponent<CanvasGroup>();
         rectTransform = GetComponent<RectTransform>();
-        
+
         if (canvasGroup == null)
         {
             canvasGroup = gameObject.AddComponent<CanvasGroup>();
@@ -24,7 +24,7 @@ public class ItemDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
         originalParent = transform.parent;
         transform.SetParent(transform.root);
         transform.SetAsLastSibling();
-        
+
         canvasGroup.blocksRaycasts = false;
         canvasGroup.alpha = 0.6f;
     }
@@ -39,13 +39,12 @@ public class ItemDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
         canvasGroup.blocksRaycasts = true;
         canvasGroup.alpha = 1f;
 
-        // Drop edilen slotu bul
         SlotScripts dropSlot = null;
-        
+
         if (eventData.pointerEnter != null)
         {
             dropSlot = eventData.pointerEnter.GetComponent<SlotScripts>();
-            
+
             if (dropSlot == null)
             {
                 dropSlot = eventData.pointerEnter.GetComponentInParent<SlotScripts>();
@@ -54,7 +53,6 @@ public class ItemDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
 
         SlotScripts originalSlot = originalParent?.GetComponent<SlotScripts>();
 
-        // Aynı slot'a mı bırakıldı?
         if (dropSlot == originalSlot)
         {
             transform.SetParent(originalParent);
@@ -62,18 +60,15 @@ public class ItemDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
             return;
         }
 
-        // ✅ GEÇERLİ BİR SLOT'A BIRAKILDIYSA
         if (dropSlot != null && originalSlot != null)
         {
             GameObject dropSlotItem = dropSlot.currentImage;
 
-            // 🔄 DROP SLOT DOLU MU? → SWAP
             if (dropSlotItem != null && dropSlotItem != gameObject)
             {
-                // 1. Drop slot'taki item'ı al ve original slot'a yerleştir
                 dropSlotItem.transform.SetParent(originalSlot.transform);
                 originalSlot.currentImage = dropSlotItem;
-                
+
                 RectTransform swappedRect = dropSlotItem.GetComponent<RectTransform>();
                 if (swappedRect != null)
                 {
@@ -82,33 +77,34 @@ public class ItemDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
                     swappedRect.localScale = Vector3.one;
                 }
 
-                // 2. Sürüklenen item'ı drop slot'a yerleştir
                 transform.SetParent(dropSlot.transform);
                 dropSlot.currentImage = gameObject;
                 FitItemToSlot();
             }
-            // 📭 DROP SLOT BOŞ → TAŞI
             else
             {
-                // Original slot'u temizle
                 if (originalSlot.currentImage == gameObject)
                 {
                     originalSlot.currentImage = null;
                 }
 
-                // Drop slot'a yerleştir
                 transform.SetParent(dropSlot.transform);
                 dropSlot.currentImage = gameObject;
                 FitItemToSlot();
             }
 
-            // 🧩 PUZZLE KONTROLÜ - BİR FRAME SONRA! (KRİTİK!)
+
             if (dropSlot.CompareTag("PuzzleSlot") || originalSlot.CompareTag("PuzzleSlot"))
             {
-                StartCoroutine(CheckPuzzleDelayed());
+                PuzzleController manager = dropSlot.GetComponentInParent<PuzzleController>();
+
+            if (manager != null)
+            {
+                // Coroutine'i BAŞLAT
+                StartCoroutine(CheckPuzzleDelayed(manager)); 
+            }
             }
         }
-        // ❌ GEÇERSİZ YER → GERİ DÖN
         else
         {
             transform.SetParent(originalParent);
@@ -116,16 +112,18 @@ public class ItemDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
         }
     }
 
-    // 🔥 KRİTİK: Bir frame bekle, sonra kontrol et
-    IEnumerator CheckPuzzleDelayed()
+    IEnumerator CheckPuzzleDelayed(PuzzleController manager)
     {
-        // Unity'nin tüm transform değişikliklerini tamamlaması için bekle
+        // 1. Kare bekle: Transform yerleşimini bitirir.
         yield return null;
 
-        PuzzleController puzzleController = FindAnyObjectByType<PuzzleController>();
-        if (puzzleController != null)
+        // 2. Kare bekle: Bileşenlerin (Item, Verifier) aktifleşmesini sağlar.
+        yield return null;
+
+        if (manager != null)
         {
-            puzzleController.CheckPuzzleStatus();
+            // Gecikmeden sonra kontrolü çağır
+            manager.CheckPuzzleStatus();
         }
     }
 
@@ -139,14 +137,12 @@ public class ItemDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
         RectTransform slotRect = parentSlot.GetComponent<RectTransform>();
         if (slotRect == null) return;
 
-        // Anchor ve pivot ayarla
         rectTransform.anchorMin = new Vector2(0.5f, 0.5f);
         rectTransform.anchorMax = new Vector2(0.5f, 0.5f);
         rectTransform.pivot = new Vector2(0.5f, 0.5f);
-        
-        // Pozisyon ve boyut
+
         rectTransform.anchoredPosition = Vector2.zero;
-        rectTransform.sizeDelta = slotRect.sizeDelta * 0.9f; // Slot boyutunun %90'ı
+        rectTransform.sizeDelta = slotRect.sizeDelta * 0.9f;
         rectTransform.localScale = Vector3.one;
     }
 }
