@@ -38,7 +38,6 @@ public class EnemyBehave : MonoBehaviour
 
     void Update()
     {
-        // 1. Durum Geçiş Mantığı (Öncelik Flee > Dash > Chase > Roam)
         State newState;
         
         if (ChaseDistance() < 10f && SeesPlayer() && player.lightTime > 0)
@@ -59,7 +58,6 @@ public class EnemyBehave : MonoBehaviour
             newState = State.Roam;
         }
 
-        // 2. Durum Değişim Kontrolü
         if (newState != state)
         {
             HandleStateExit(state);
@@ -67,43 +65,38 @@ public class EnemyBehave : MonoBehaviour
             HandleStateEnter(state);
         }
 
-        // 3. Durum Eylemleri
         HandleStateAction(state);
     }
     
-    // YENİ METOT: Durumdan çıkarken temizlik yapar
     private void HandleStateExit(State exitingState)
     {
-        // (Şimdilik boş bırakılabilir, ancak ileride temizlik için kullanılabilir)
     }
     
-    // YENİ METOT: Duruma girerken başlatma ve Fizik Yetkisini Yönetir
     private void HandleStateEnter(State enteringState)
     {
-        // 🛑 KRİTİK FİZİK YÖNETİMİ: Titremeyi çözmek için
         if (enteringState == State.Roam)
         {
-            // Roam'a girerken Rigidbody'yi durdur ve transform.position'a yetki ver
+            
             if (rb != null)
             {
-                rb.velocity = Vector2.zero;
-                rb.isKinematic = true; 
+                rb.linearVelocity = Vector2.zero;
+                rb.bodyType = RigidbodyType2D.Kinematic;
             }
             wayPointMover.canMove = true;
             wayPointMover.ResumeMovement(); 
         }
         else if (enteringState == State.Chase || enteringState == State.Dash || enteringState == State.Flee)
         {
-            // Chase/Dash/Flee'ye girerken Rigidbody'yi aktifleştir
+            
             if (rb != null)
             {
-                rb.isKinematic = false;
+                rb.bodyType = RigidbodyType2D.Dynamic;
                 rb.WakeUp();
             }
             wayPointMover.canMove = false;
         }
         
-        // Diğer Durum Giriş Ayarları
+        
         switch (enteringState)
         {
             case State.Flee:
@@ -112,10 +105,10 @@ public class EnemyBehave : MonoBehaviour
         }
     }
     
-    // YENİ METOT: Her Frame'de çalışacak eylemler
+    
     private void HandleStateAction(State currentState)
     {
-        // Tüm hareket bayraklarını resetle (yalnızca o anki duruma yetki ver)
+        
         enemy.canMove = false;
         wayPointMover.canMove = false;
 
@@ -125,17 +118,18 @@ public class EnemyBehave : MonoBehaviour
                 enemy.canDash = true;
                 soundPlayed = false;
                 hasFled = false;
-                wayPointMover.canMove = true; // WayPointMover'a yetki ver
+                wayPointMover.canMove = true; 
                 break;
                 
             case State.Chase:
                 if (gameObject.name == "Mother" && !soundPlayed) SoundEffectManager.Play("chaseMother");
+                if (gameObject.name == "Daughter" && !soundPlayed) SoundEffectManager.Play("success");
                 soundPlayed = true;
-                enemy.canMove = true; // Enemy/Chase scriptine yetki ver
+                enemy.canMove = true; 
                 break;
                 
             case State.Dash:
-                enemy.canMove = true; // Dash, Enemy scriptinde yönetilir
+                enemy.canMove = true; 
                 break;
 
             case State.Flee:
@@ -143,7 +137,7 @@ public class EnemyBehave : MonoBehaviour
                 {
                     wayPointMover.canMove = true;
                     
-                    // Geriye doğru WayPoint'e sıçra
+                    
                     wayPointMover.currentWayPointIndex -= 3;
                     if (wayPointMover.currentWayPointIndex < 0)
                     {
@@ -153,11 +147,11 @@ public class EnemyBehave : MonoBehaviour
 
                     hasFled = true;
                 }
-                wayPointMover.canMove = true; // Kaçış hareketini WayPointMover'a ver
+                wayPointMover.canMove = true; 
                 break;
 
             case State.Die:
-                // Ölüm mantığı buraya gelir
+                
                 break;
         }
     }
@@ -173,7 +167,7 @@ public class EnemyBehave : MonoBehaviour
         LayerMask mask = LayerMask.GetMask("Player", "Wall");
         Vector2 direction = (player.transform.position - transform.position).normalized;
         
-        // Raycast mesafesi
+        
         RaycastHit2D hit = Physics2D.Raycast(transform.position, direction, 5f, mask); 
         
         if (hit.collider != null)
@@ -184,7 +178,7 @@ public class EnemyBehave : MonoBehaviour
             }
             else
             {
-                return false; // Duvar veya başka bir engel var
+                return false; 
             }
         }
         else

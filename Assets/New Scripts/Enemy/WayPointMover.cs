@@ -5,10 +5,10 @@ public class WayPointMover : MonoBehaviour
 {
     [SerializeField] Transform wayPointParent;
     public bool canMove = true;
-    [SerializeField]public float movementSpeed = 2f;
+    [SerializeField] public float movementSpeed = 2f;
     [SerializeField] float waitTime = 1f;
     public bool loopWayPoints = true;
-    [SerializeField]public Transform[] wayPoints;
+    [SerializeField] public Transform[] wayPoints;
     public int currentWayPointIndex;
     private bool isWaiting;
     
@@ -20,15 +20,16 @@ public class WayPointMover : MonoBehaviour
         {
             wayPoints[i] = wayPointParent.GetChild(i);
         }
+
     }
 
     void FixedUpdate()
     {
         if (canMove)
         {
-           Roam(); 
+            Roam();
         }
-        
+
     }
 
     public void Roam()
@@ -61,8 +62,8 @@ public class WayPointMover : MonoBehaviour
 
     public void ResumeMovement()
     {
-        StopAllCoroutines(); 
+        StopAllCoroutines();
         isWaiting = false;
     }
-    
+
 }
