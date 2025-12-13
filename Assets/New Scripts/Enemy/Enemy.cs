@@ -5,6 +5,7 @@ public class Enemy : MonoBehaviour
 {
 
     Rigidbody2D rb;
+    public bool canMove = true;
     public float movementSpeed = 2f;
     Vector2 moveDirection;
     Transform target;
@@ -31,6 +32,11 @@ public class Enemy : MonoBehaviour
 
     void Update()
     {
+        if (!canMove)
+        {
+            return;
+        }
+
         if (isDashing)
         {
             return;
@@ -40,13 +46,17 @@ public class Enemy : MonoBehaviour
             Vector3 direction = (target.transform.position - transform.position).normalized;
             moveDirection = direction;
         }
-        if (Vector2.Distance(target.position, transform.position) < 10f && canDash)
+        if (Vector2.Distance(target.position, transform.position) < 10f && canDash && gameObject.name == "Daughter")
         {
             StartCoroutine(Dash());
         }
     }
     void FixedUpdate()
     {
+        if (!canMove)
+        {
+            return;
+        }
         if (isDashing)
         {
             return;
@@ -58,7 +68,6 @@ public class Enemy : MonoBehaviour
     }
     IEnumerator Dash()
     {
-        // ses çal
         canDash = false;
         isDashing = true;
         rb.linearVelocity = new Vector2(moveDirection.x, moveDirection.y) * dashingSpeed;

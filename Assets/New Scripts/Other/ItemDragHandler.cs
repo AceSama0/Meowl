@@ -27,6 +27,7 @@ public class ItemDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
 
         canvasGroup.blocksRaycasts = false;
         canvasGroup.alpha = 0.6f;
+        SoundEffectManager.Play("HoldingMirror");
     }
 
     public void OnDrag(PointerEventData eventData)

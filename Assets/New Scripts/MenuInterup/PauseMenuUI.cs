@@ -8,6 +8,7 @@ public class PauseMenuUI : MonoBehaviour
 
     [SerializeField] GameObject PauseUI;
     InventoryScript inventoryScript;
+    PuzzleActivate2 puzzleActivate2;
 
     void Awake()
     {
@@ -21,11 +22,12 @@ public class PauseMenuUI : MonoBehaviour
         }
 
         inventoryScript = FindAnyObjectByType<InventoryScript>();
+        puzzleActivate2 = FindAnyObjectByType<PuzzleActivate2>();
     }
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Escape) && !inventoryScript.isAnotherScreenOpened)
+        if (Input.GetKeyDown(KeyCode.Escape) && !puzzleActivate2.puzzleOpened && !inventoryScript.isAnotherScreenOpened)
         {
             if (isGamePause)
             {
@@ -41,6 +43,7 @@ public class PauseMenuUI : MonoBehaviour
 
     public void Resume()
     {
+        inventoryScript.isAnotherScreenOpened = false;
         PauseUI.SetActive(false);
         Time.timeScale = 1f;
         isGamePause = false;

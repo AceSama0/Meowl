@@ -10,6 +10,7 @@ public class Restart : MonoBehaviour
     
     public void RestarT()
     {
+        MusicManager.PlayBackgroundMusic(true);
         SceneManager.LoadScene("House");
     }
     

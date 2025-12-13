@@ -3,29 +3,29 @@ using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+
 enum State
 {
     Chase,
     Roam,
-    Search,
+    Search, 
     Dash,
     Flee,
     Die,
 }
+
 public class EnemyBehave : MonoBehaviour
 {
     Player player;
+    bool soundPlayed = false;
     public Vector2 lastSeen;
     Enemy enemy;
     bool hasFled = false;
 
     [SerializeField] Transform spawnPoint;
-    [SerializeField] float waitingTime;
     WayPointMover wayPointMover;
     State state;
     Rigidbody2D rb;
-
-
 
     void Awake()
     {
@@ -38,60 +38,130 @@ public class EnemyBehave : MonoBehaviour
 
     void Update()
     {
-        if (ChaseDistance() < 10f&& SeesPlayer() && player.lightTime > 0)
+        // 1. Durum Geçiş Mantığı (Öncelik Flee > Dash > Chase > Roam)
+        State newState;
+        
+        if (ChaseDistance() < 10f && SeesPlayer() && player.lightTime > 0)
         {
-            state = State.Flee;
+            newState = State.Flee;
         }
         else if (ChaseDistance() < 5f && SeesPlayer() && enemy.canDash)
         {
-            state = State.Dash;
+            newState = State.Dash;
         }
-
         else if (ChaseDistance() < 10f && SeesPlayer())
         {
-            state = State.Chase;
+            newState = State.Chase;
             lastSeen = player.transform.position;
         }
-
         else
         {
-            state = State.Roam;
+            newState = State.Roam;
         }
 
-        switch (state)
+        // 2. Durum Değişim Kontrolü
+        if (newState != state)
+        {
+            HandleStateExit(state);
+            state = newState;
+            HandleStateEnter(state);
+        }
+
+        // 3. Durum Eylemleri
+        HandleStateAction(state);
+    }
+    
+    // YENİ METOT: Durumdan çıkarken temizlik yapar
+    private void HandleStateExit(State exitingState)
+    {
+        // (Şimdilik boş bırakılabilir, ancak ileride temizlik için kullanılabilir)
+    }
+    
+    // YENİ METOT: Duruma girerken başlatma ve Fizik Yetkisini Yönetir
+    private void HandleStateEnter(State enteringState)
+    {
+        // 🛑 KRİTİK FİZİK YÖNETİMİ: Titremeyi çözmek için
+        if (enteringState == State.Roam)
+        {
+            // Roam'a girerken Rigidbody'yi durdur ve transform.position'a yetki ver
+            if (rb != null)
+            {
+                rb.velocity = Vector2.zero;
+                rb.isKinematic = true; 
+            }
+            wayPointMover.canMove = true;
+            wayPointMover.ResumeMovement(); 
+        }
+        else if (enteringState == State.Chase || enteringState == State.Dash || enteringState == State.Flee)
+        {
+            // Chase/Dash/Flee'ye girerken Rigidbody'yi aktifleştir
+            if (rb != null)
+            {
+                rb.isKinematic = false;
+                rb.WakeUp();
+            }
+            wayPointMover.canMove = false;
+        }
+        
+        // Diğer Durum Giriş Ayarları
+        switch (enteringState)
+        {
+            case State.Flee:
+                hasFled = false; 
+                break;
+        }
+    }
+    
+    // YENİ METOT: Her Frame'de çalışacak eylemler
+    private void HandleStateAction(State currentState)
+    {
+        // Tüm hareket bayraklarını resetle (yalnızca o anki duruma yetki ver)
+        enemy.canMove = false;
+        wayPointMover.canMove = false;
+
+        switch (currentState)
         {
             case State.Roam:
-                hasFled = false;
-                enemy.enabled = false;
-                wayPointMover.enabled = true;
                 enemy.canDash = true;
+                soundPlayed = false;
+                hasFled = false;
+                wayPointMover.canMove = true; // WayPointMover'a yetki ver
                 break;
+                
             case State.Chase:
-                enemy.enabled = true;
-                wayPointMover.enabled = false;
+                if (gameObject.name == "Mother" && !soundPlayed) SoundEffectManager.Play("chaseMother");
+                soundPlayed = true;
+                enemy.canMove = true; // Enemy/Chase scriptine yetki ver
                 break;
+                
             case State.Dash:
+                enemy.canMove = true; // Dash, Enemy scriptinde yönetilir
                 break;
 
             case State.Flee:
                 if (!hasFled)
                 {
-                    enemy.enabled = false;
-                    wayPointMover.currentWayPointIndex -= 3; 
+                    wayPointMover.canMove = true;
+                    
+                    // Geriye doğru WayPoint'e sıçra
+                    wayPointMover.currentWayPointIndex -= 3;
                     if (wayPointMover.currentWayPointIndex < 0)
                     {
                         wayPointMover.currentWayPointIndex = 0;
                     }
-                    wayPointMover.enabled = true;
+                    wayPointMover.ResumeMovement(); 
+
                     hasFled = true;
                 }
+                wayPointMover.canMove = true; // Kaçış hareketini WayPointMover'a ver
                 break;
 
             case State.Die:
+                // Ölüm mantığı buraya gelir
                 break;
-
         }
     }
+
 
     float ChaseDistance()
     {
@@ -102,7 +172,10 @@ public class EnemyBehave : MonoBehaviour
     {
         LayerMask mask = LayerMask.GetMask("Player", "Wall");
         Vector2 direction = (player.transform.position - transform.position).normalized;
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, direction, 5f, mask);
+        
+        // Raycast mesafesi
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, direction, 5f, mask); 
+        
         if (hit.collider != null)
         {
             if (hit.collider.CompareTag("Player"))
@@ -111,7 +184,7 @@ public class EnemyBehave : MonoBehaviour
             }
             else
             {
-                return false;
+                return false; // Duvar veya başka bir engel var
             }
         }
         else
@@ -119,14 +192,4 @@ public class EnemyBehave : MonoBehaviour
             return false;
         }
     }
-
-
-    IEnumerator Waiting()
-    {
-        float oldSpeed = enemy.movementSpeed;
-        enemy.movementSpeed = 0f;
-        yield return new WaitForSeconds(waitingTime);
-        enemy.movementSpeed = oldSpeed;
-    }
-
 }

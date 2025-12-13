@@ -5,8 +5,9 @@ public class MainMenuScript : MonoBehaviour
 {
     public void StartGame()
     {
-       SceneManager.LoadScene(1);
-       Time.timeScale = 1f; 
+        MusicManager.PlayBackgroundMusic(true);
+        SceneManager.LoadScene(1);
+        Time.timeScale = 1f;
     }
 
     public void CreditsScene()

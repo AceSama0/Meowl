@@ -6,9 +6,12 @@ public class PuzzleActivate2 : MonoBehaviour
     public GameObject PuzzleName;
     InventoryScript inventoryScript;
     PauseMenuUI pause;
+    Player player;
+    public bool puzzleOpened = false;
 
     void Start()
     {
+        player = FindAnyObjectByType<Player>();
         pause = FindAnyObjectByType<PauseMenuUI>();
         PuzzleName.SetActive(false);
         inventoryScript = FindAnyObjectByType<InventoryScript>();
@@ -20,26 +23,27 @@ public class PuzzleActivate2 : MonoBehaviour
         {
             if (PuzzleName != null)
             {
-
                 PuzzleName.SetActive(true);
             }
-            inventoryScript.isAnotherScreenOpened = true;
+            player.canMove = false;
+            puzzleOpened = true;
+            
         }
     }
-
-    IEnumerator WaitSome()
+    void OnTriggerExit2D(Collider2D collision)
     {
-        yield return new WaitForSeconds(1);
-        inventoryScript.isAnotherScreenOpened = false;
+        puzzleOpened = false;
     }
-
     void Update()
     {
-
-        if (Input.GetKeyDown(KeyCode.Escape) && inventoryScript.isAnotherScreenOpened && !pause.isGamePause)
+        if (Input.GetKeyDown(KeyCode.Escape) && !pause.isGamePause)
         {
+            inventoryScript.isAnotherScreenOpened = false;
+            player.canMove = true;
             PuzzleName.SetActive(false);
-            StartCoroutine(WaitSome());
+            return;
         }
     }
+
+    
 }

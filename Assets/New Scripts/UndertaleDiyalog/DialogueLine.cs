@@ -15,8 +15,6 @@ namespace DiaglogueSystem
         [SerializeField] float delayBetween;
         [SerializeField] float delay;
 
-        [Header("Sound")]
-        [SerializeField] AudioClip sound; 
         [Header("Character Image")]
         [SerializeField] Sprite characterSprite;
         [SerializeField] Image imageHolder;
@@ -30,7 +28,7 @@ namespace DiaglogueSystem
         }
         void Start()
         {
-            StartCoroutine(WriteText(input, textHolder, delay, textColor, textFont, sound));
+            StartCoroutine(WriteText(input, textHolder, delay, textColor, textFont));
         }
     }
 }

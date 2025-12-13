@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class GettingLantern : MonoBehaviour
@@ -8,6 +9,7 @@ public class GettingLantern : MonoBehaviour
     bool isPlayerNear;
     bool isRaiseing;
     Animator animator;
+    
 
     void Awake()
     {
@@ -48,6 +50,7 @@ public class GettingLantern : MonoBehaviour
         animator.SetBool("RaiseLanternLeft", false);
         isRaiseing = false;
         player.canMove = true;
+        player.lightTime = 40f;
         enabled = false;
     }
 }

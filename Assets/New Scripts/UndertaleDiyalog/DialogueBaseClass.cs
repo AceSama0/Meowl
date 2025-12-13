@@ -8,14 +8,14 @@ namespace DiaglogueSystem
     public class DialogueBaseClass : MonoBehaviour
     {
         public bool finished { get; private set; }
-        protected IEnumerator WriteText(string input, Text textHolder,float delay, Color textColor, Font textFont, AudioClip sound)
+        protected IEnumerator WriteText(string input, Text textHolder,float delay, Color textColor, Font textFont)
         {
             textHolder.color = textColor;
             textHolder.font = textFont;
             for (int i = 0; i < input.Length; i++)
             {
                 textHolder.text += input[i];
-                SoundManager.instance.PlaySound(sound);
+                SoundEffectManager.Play("dialogue");
                 yield return new WaitForSeconds(delay);
             }
 

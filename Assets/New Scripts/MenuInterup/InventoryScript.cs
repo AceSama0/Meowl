@@ -3,10 +3,11 @@ using UnityEngine;
 public class InventoryScript : MonoBehaviour
 {
     [SerializeField] GameObject InventoryUI;
-    public bool isAnotherScreenOpened = false;
-    [SerializeField]PauseMenuUI pauseMenuUI;
+    PauseMenuUI pauseMenuUI;
+    public bool isAnotherScreenOpened;
     void Start()
     {
+        pauseMenuUI = FindAnyObjectByType<PauseMenuUI>();
         InventoryUI.SetActive(false);
     }
 

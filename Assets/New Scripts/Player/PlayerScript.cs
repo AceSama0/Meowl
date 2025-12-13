@@ -9,7 +9,9 @@ using UnityEngine.SceneManagement;
 public class Player : MonoBehaviour
 {
     bool idleing;
-    Enemy enemy;
+    [SerializeField]float footStepDuration = 0.01f;
+    bool isPlayingFootSteps;
+    public string animName = "isWalking";
     public bool canMove = true;
     float basicSpeed;
     private Coroutine activeCoroutine;
@@ -25,7 +27,7 @@ public class Player : MonoBehaviour
 
     [SerializeField] Light2D lantern;
 
-    public float lightTime;
+    public float lightTime = 0;
     [Header("Puzzle")]
     [SerializeField] Vector2 movement;
     public float speed = 5f;
@@ -51,7 +53,6 @@ public class Player : MonoBehaviour
 
     void Start()
     {
-        enemy = FindAnyObjectByType<Enemy>();
         lantern.transform.position = lightWayPoints[0].position;
         lantern.pointLightInnerRadius = 5f;
         StartCoroutine(switchingLight());
@@ -68,6 +69,15 @@ public class Player : MonoBehaviour
         }
         playerMovement();
         LightOnOff();
+
+        if (rb.linearVelocity.magnitude > 0 && !isPlayingFootSteps)
+        {
+            PlayFootSteps();
+        }
+        else if (rb.linearVelocity.magnitude == 0)
+        {
+            StopFootSteps();
+        }
 
     }
 
@@ -121,12 +131,12 @@ public class Player : MonoBehaviour
 
         if (inputX != 0 || inputY != 0)
         {
-            animator.SetBool("isWalking", true);
+            animator.SetBool(animName, true);
             idleing = false;
         }
         else
         {
-            animator.SetBool("isWalking", false);
+            animator.SetBool(animName, false);
             idleing = true;
         }
 
@@ -153,8 +163,26 @@ public class Player : MonoBehaviour
 
         if (collision.gameObject.CompareTag("Enemy"))
         {
+            MusicManager.PauseBackgroundMusic();
             SceneManager.LoadScene("KızÖlüm");
         }
+    }
+
+    void PlayFootSteps()
+    {
+        isPlayingFootSteps = true;
+        InvokeRepeating(nameof(FootSteps), 0, footStepDuration);
+    }
+
+    void StopFootSteps()
+    {
+        isPlayingFootSteps = false;
+        CancelInvoke(nameof(FootSteps));
+    }
+
+    void FootSteps()
+    {
+        SoundEffectManager.Play("walking", true);
     }
 
 

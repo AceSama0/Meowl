@@ -1,12 +1,9 @@
 using System.Collections;
-using System.Collections.Generic;
 using Unity.Cinemachine;
-using Unity.Mathematics;
-using Unity.VisualScripting;
 using UnityEngine;
 public class MapTransition : MonoBehaviour
 {
-    Enemy enemy;
+    [SerializeField] Enemy enemy;
     Player player;
     WayPointMover wayPointMover;
     public bool isPlayerInside;
@@ -35,7 +32,6 @@ public class MapTransition : MonoBehaviour
     void Awake()
     {
         vCam = FindAnyObjectByType<CinemachineCamera>();
-        enemy = FindAnyObjectByType<Enemy>();
         player = FindAnyObjectByType<Player>();
         confiner = FindAnyObjectByType<CinemachineConfiner2D>();
         vCam.Follow = cameraPos;
@@ -81,6 +77,8 @@ public class MapTransition : MonoBehaviour
         wayPointMover = enemy.GetComponent<WayPointMover>();
         float zeroSpeed = wayPointMover.movementSpeed;
         wayPointMover.movementSpeed = 0; // kapı sesi gelmeye başlar
+        SoundEffectManager.Play("knocking");
+        if (enemy.name == "Mother") SoundEffectManager.Play("enemyScream");
         yield return new WaitForSeconds(3);
         wayPointMover.currentWayPointIndex += 5;
         if (wayPointMover.currentWayPointIndex > wayPointMover.wayPoints.Length)
@@ -98,15 +96,13 @@ public class MapTransition : MonoBehaviour
 
     IEnumerator TransitionEffect()
     {
-        float currentSpeed = player.speed;
-        float EnemyCurrentSpeed = enemy.movementSpeed;
-        Animation.SetActive(true);
-        player.speed = 0;
-        enemy.movementSpeed = 0;
+        player.canMove = false;
+        Animation.SetActive(true);        
+        SoundEffectManager.Play("door");
         yield return new WaitForSeconds(1);
         Animation.SetActive(false);
-        player.speed = currentSpeed;
-        enemy.movementSpeed = EnemyCurrentSpeed;
+        player.canMove = true;
+        
     }
     void MapChange()
     {
@@ -117,7 +113,6 @@ public class MapTransition : MonoBehaviour
         if (maptoActivate != null)
         {
             maptoActivate.SetActive(true);
-            // vCam.enabled = SetCineMachine;
             vCam.Follow = cameraPos;
         }
     }

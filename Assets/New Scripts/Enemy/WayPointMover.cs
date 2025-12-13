@@ -4,6 +4,7 @@ using UnityEngine;
 public class WayPointMover : MonoBehaviour
 {
     [SerializeField] Transform wayPointParent;
+    public bool canMove = true;
     [SerializeField]public float movementSpeed = 2f;
     [SerializeField] float waitTime = 1f;
     public bool loopWayPoints = true;
@@ -21,9 +22,13 @@ public class WayPointMover : MonoBehaviour
         }
     }
 
-    void Update()
+    void FixedUpdate()
     {
-        Roam();
+        if (canMove)
+        {
+           Roam(); 
+        }
+        
     }
 
     public void Roam()
@@ -51,6 +56,12 @@ public class WayPointMover : MonoBehaviour
         isWaiting = true;
         yield return new WaitForSeconds(waitTime);
         currentWayPointIndex = loopWayPoints ? (currentWayPointIndex + 1) % wayPoints.Length : Mathf.Min(currentWayPointIndex + 1, wayPoints.Length - 1);
+        isWaiting = false;
+    }
+
+    public void ResumeMovement()
+    {
+        StopAllCoroutines(); 
         isWaiting = false;
     }
     

@@ -4,11 +4,13 @@ using UnityEngine;
 public class PuzzleController : MonoBehaviour
 {
     [SerializeField] private SlotScripts[] allPuzzleSlots;
+    Player player;
     [SerializeField] GameObject puzzle;
     private InventoryScript inventoryScript;
     void Start()
     {
         inventoryScript = FindAnyObjectByType<InventoryScript>();
+        player = FindAnyObjectByType<Player>();
     }
 
     private bool EnsureSlotsAreLoaded()
@@ -67,8 +69,10 @@ public class PuzzleController : MonoBehaviour
             
             if (puzzle != null)
             {
+                SoundEffectManager.Play("success");
                 inventoryScript.isAnotherScreenOpened = false;
                 puzzle.SetActive(false);
+                player.canMove = true;
                 
             }
             Destroy(this);
