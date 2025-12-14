@@ -21,6 +21,7 @@ public class PlayerItemCollecter : MonoBehaviour
                 {
                     item.Pickup();
                     Destroy(collision.gameObject);
+                    inventoryController.RefreshInventoryDisplay();
                 }                
             }
         }

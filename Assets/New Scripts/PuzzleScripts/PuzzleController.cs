@@ -7,7 +7,7 @@ public class PuzzleController : MonoBehaviour
     Player player;
     [SerializeField] GameObject puzzle;
     private InventoryScript inventoryScript;
-    void Start()
+    void Awake()
     {
         inventoryScript = FindAnyObjectByType<InventoryScript>();
         player = FindAnyObjectByType<Player>();

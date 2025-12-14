@@ -47,7 +47,7 @@ public class EnemyBehave : MonoBehaviour
 
     void Update()
     {
-        
+        SetEnemyLook();
         visionCheckTimer += Time.deltaTime;
         if (visionCheckTimer >= VISION_CHECK_INTERVAL)
         {
@@ -69,6 +69,18 @@ public class EnemyBehave : MonoBehaviour
         }
 
         HandleStateAction(state);
+    }
+
+    void SetEnemyLook()
+    {
+        if(canSeePlayer && player.transform.position.x > transform.position.x)
+        {
+            spriteRenderer.flipX = false;
+        }
+        else
+        {
+            spriteRenderer.flipX = true;
+        }
     }
 
     

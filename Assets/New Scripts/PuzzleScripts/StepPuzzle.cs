@@ -49,10 +49,6 @@ public class StepPuzzle : MonoBehaviour
 
     private void SolveMainPuzzle()
     {
-        IsPuzzleCompleted = true;
-        
-        Debug.Log("TEBRİKLER! TÜM 5 ODUN PARÇASI TAMAMLANDI VE BULMACA ÇÖZÜLDÜ!");
-        
-        
+        IsPuzzleCompleted = true;  
     }
 }

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using UnityEngine.Rendering; // WaitForEndOfFrame için eklendi
 
 public class InventoryController : MonoBehaviour
 {
@@ -11,11 +12,11 @@ public class InventoryController : MonoBehaviour
     [SerializeField] int slotCount = 15;
 
     private bool isInitialized = false;
+    private bool isRefreshing = false; // Yenileme kilit bayrağı
 
     void Start()
     {
-        ItemDictionary = FindAnyObjectByType<ItemDictionary>();
-
+        ItemDictionary = FindAnyObjectByType<ItemDictionary>(); 
         InitializeInventory();
     }
 
@@ -32,6 +33,8 @@ public class InventoryController : MonoBehaviour
 
         isInitialized = true;
     }
+    
+    // AddItem metodu sadece item'ı ekler, UI'ı yenilemez.
     public bool AddItem(GameObject itemPrefab)
     {
         if (!isInitialized)
@@ -47,8 +50,8 @@ public class InventoryController : MonoBehaviour
                 GameObject item = Instantiate(itemPrefab, slot.transform);
                 item.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
                 slot.currentImage = item;
-                RefreshInventoryDisplay();
-
+                
+                // RefreshInventoryDisplay() Build hatalarını önlemek için burada çağrılmamalıdır.
                 return true;
             }
         }
@@ -80,15 +83,17 @@ public class InventoryController : MonoBehaviour
 
         return invData;
     }
+    
     public void RefreshInventoryDisplay()
     {
-        List<InventorySaveData> currentItems = GetInventoryItems();
+        if (isRefreshing) return; // Zaten yenileniyorsa engelle
 
+        List<InventorySaveData> currentItems = GetInventoryItems();
         SetIventortyItems(currentItems);
     }
+    
     public void RemoveItemByID(int itemID)
     {
- 
         foreach (Transform slotTransform in inventoryPanel.transform)
         {
             SlotScripts slot = slotTransform.GetComponent<SlotScripts>();
@@ -99,8 +104,6 @@ public class InventoryController : MonoBehaviour
                 if (item != null && item.ID == itemID)
                 {
                     Destroy(slot.currentImage);
-
-
                     slot.currentImage = null;
 
                     return;
@@ -112,7 +115,6 @@ public class InventoryController : MonoBehaviour
 
     public void SetIventortyItems(List<InventorySaveData> inventorySaveData)
     {
-
         if (inventorySaveData == null)
         {
             return;
@@ -125,14 +127,30 @@ public class InventoryController : MonoBehaviour
     //Load Inventory
     private const int SLOTS_PER_ROW = 5;
     private const int ROW_ID_RANGE = 5;
+    
     IEnumerator SafeLoadInventory(List<InventorySaveData> inventorySaveData)
     {
+        isRefreshing = true; // KİLİTLE: Yenileme başladı
+
+        // 1. Tüm eski slotları ve içindeki itemları sil
         for (int i = inventoryPanel.transform.childCount - 1; i >= 0; i--)
         {
             Destroy(inventoryPanel.transform.GetChild(i).gameObject);
         }
-        yield return null;
+        
+        // 🛑 KRİTİK DÜZELTME: Tüm Destory işlemlerinin bitmesini aktif olarak bekle
+        int safetyCounter = 0;
+        // Çocuk sayısı 0'dan büyük olduğu sürece (ve sonsuz döngüden kaçınmak için sayaca bak)
+        while (inventoryPanel.transform.childCount > 0 && safetyCounter < 100) 
+        {
+            yield return null; // Bir sonraki frame'i bekle
+            safetyCounter++;
+        }
+        
+        // Ekstra güvenlik için bir frame daha bekle
+        yield return new WaitForEndOfFrame(); 
 
+        // 2. Veriyi sırala ve yeni slotları oluştur
         List<InventorySaveData> sortedData = inventorySaveData.OrderBy(data => data.itemID).ToList();
 
         for (int i = 0; i < slotCount; i++)
@@ -140,14 +158,15 @@ public class InventoryController : MonoBehaviour
             Instantiate(slotPrefab, inventoryPanel.transform);
         }
 
+        yield return null; // Yeni slotların yerleşmesi için bekle
+
+        // 3. İtemları yerleştir
         for (int i = 0; i < sortedData.Count; i++)
         {
             InventorySaveData data = sortedData[i];
 
             int rowNumber = (Mathf.Max(1, data.itemID) - 1) / ROW_ID_RANGE;
-
             int columnPositionInRow = (Mathf.Max(1, data.itemID) - 1) % ROW_ID_RANGE;
-
             int newSlotIndex = (rowNumber * SLOTS_PER_ROW) + columnPositionInRow;
 
 
@@ -166,5 +185,7 @@ public class InventoryController : MonoBehaviour
                 }
             }
         }
+        
+        isRefreshing = false; // KİLİDİ AÇ: Yenileme bitti
     }
 }

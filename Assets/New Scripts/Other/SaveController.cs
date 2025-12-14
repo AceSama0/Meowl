@@ -2,7 +2,6 @@ using UnityEngine;
 using System.IO;
 using Unity.Cinemachine;
 using System.Collections;
-using Microsoft.Unity.VisualStudio.Editor;
 using UnityEngine.SceneManagement;
 
 public class SaveController : MonoBehaviour
