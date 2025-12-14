@@ -27,7 +27,7 @@ public class ItemDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
 
         canvasGroup.blocksRaycasts = false;
         canvasGroup.alpha = 0.6f;
-        SoundEffectManager.Play("HoldingMirror");
+        SoundEffectManager.Play("HoldingMirror");        
     }
 
     public void OnDrag(PointerEventData eventData)
@@ -99,11 +99,11 @@ public class ItemDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
             {
                 PuzzleController manager = dropSlot.GetComponentInParent<PuzzleController>();
 
-            if (manager != null)
-            {
-                // Coroutine'i BAŞLAT
-                StartCoroutine(CheckPuzzleDelayed(manager)); 
-            }
+                if (manager != null)
+                {
+                    // Coroutine'i BAŞLAT
+                    StartCoroutine(CheckPuzzleDelayed(manager));
+                }
             }
         }
         else
@@ -115,15 +115,12 @@ public class ItemDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
 
     IEnumerator CheckPuzzleDelayed(PuzzleController manager)
     {
-        // 1. Kare bekle: Transform yerleşimini bitirir.
         yield return null;
 
-        // 2. Kare bekle: Bileşenlerin (Item, Verifier) aktifleşmesini sağlar.
         yield return null;
 
         if (manager != null)
         {
-            // Gecikmeden sonra kontrolü çağır
             manager.CheckPuzzleStatus();
         }
     }

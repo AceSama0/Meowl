@@ -75,7 +75,7 @@ public class PuzzleController : MonoBehaviour
                 player.canMove = true;
                 
             }
-            Destroy(this);
+            Destroy(gameObject);
         }
         else
         {

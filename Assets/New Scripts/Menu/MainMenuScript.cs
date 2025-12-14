@@ -3,9 +3,14 @@ using UnityEngine.SceneManagement;
 
 public class MainMenuScript : MonoBehaviour
 {
-    public void StartGame()
+    
+    void Start()
     {
         MusicManager.PlayBackgroundMusic(true);
+    }
+    public void StartGame()
+    {
+        
         SceneManager.LoadScene(1);
         Time.timeScale = 1f;
     }

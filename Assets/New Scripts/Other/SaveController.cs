@@ -49,35 +49,39 @@ public class SaveController : MonoBehaviour
     }
 
     public void LoadGame()
-{
-
-    if (File.Exists(saveLocation))
     {
-        
-        SaveData saveData = JsonUtility.FromJson<SaveData>(File.ReadAllText(saveLocation));
 
-        if (InventoryController == null)
+        if (File.Exists(saveLocation))
         {
-            NewGame(); 
-            return;
-        }
 
-        
-        GameObject.FindGameObjectWithTag("Player").transform.position = saveData.playerTransform;
-        FindAnyObjectByType<CinemachineConfiner2D>().BoundingShape2D = GameObject.Find(saveData.mapBoundary).GetComponent<PolygonCollider2D>();
-        
-        InventoryController.SetIventortyItems(saveData.InventorySaveData); 
+            SaveData saveData = JsonUtility.FromJson<SaveData>(File.ReadAllText(saveLocation));
+
+            if (InventoryController == null)
+            {
+                NewGame();
+                return;
+            }
+
+
+            GameObject.FindGameObjectWithTag("Player").transform.position = saveData.playerTransform;
+            FindAnyObjectByType<CinemachineConfiner2D>().BoundingShape2D = GameObject.Find(saveData.mapBoundary).GetComponent<PolygonCollider2D>();
+
+            InventoryController.SetIventortyItems(saveData.InventorySaveData);
+        }
+        else
+        {
+            NewGame();
+        }
     }
-    else
-    {
-        NewGame();
-    }
-}
 
     IEnumerator ShowSaving()
     {
-        saveUI.SetActive(true);
-        yield return new WaitForSeconds(2);
-        saveUI.SetActive(false);
+        if (saveUI != null)
+        {
+            saveUI.SetActive(true);
+            yield return new WaitForSeconds(2);
+            saveUI.SetActive(false);
+        }
+
     }
 }

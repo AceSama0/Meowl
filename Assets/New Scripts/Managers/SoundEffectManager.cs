@@ -18,7 +18,7 @@ public class SoundEffectManager : MonoBehaviour
             audioSource = audioSources[0];
             randomPitchAudioSource = audioSources[1];
             soundEffectLibrary = GetComponent<SoundEffectLibrary>();
-            // DontDestroyOnLoad(gameObject);
+            DontDestroyOnLoad(gameObject);
         }
         else
         {
@@ -28,7 +28,10 @@ public class SoundEffectManager : MonoBehaviour
 
     void Start()
     {
-        sfxSlider.onValueChanged.AddListener(delegate { OnValueChanged(); });
+        if (sfxSlider != null)
+        {
+            sfxSlider.onValueChanged.AddListener(delegate { OnValueChanged(); });
+        }
     }
 
     public static void Play(string soundName, bool randomPitch = false)
@@ -51,6 +54,7 @@ public class SoundEffectManager : MonoBehaviour
     public static void SetVolume(float volume)
     {
         audioSource.volume = volume;
+        randomPitchAudioSource.volume = volume;
     }
 
     public void OnValueChanged()

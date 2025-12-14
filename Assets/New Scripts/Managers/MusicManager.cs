@@ -1,11 +1,13 @@
 using UnityEngine;
+
 using UnityEngine.UI;
 
 public class MusicManager : MonoBehaviour
 {
     private static MusicManager instance;
     private AudioSource audioSource;
-    [SerializeField] AudioClip[] backgroundMusic;
+    [SerializeField] AudioClip backgroundMusic;
+    public static int musicIndex;
     [SerializeField] Slider musicslider;
     void Awake()
     {
@@ -24,7 +26,7 @@ public class MusicManager : MonoBehaviour
     {
         if (backgroundMusic != null)
         {
-            PlayBackgroundMusic(false, backgroundMusic[0]);
+            PlayBackgroundMusic(false, backgroundMusic);
         }
         if (musicslider != null)
         {

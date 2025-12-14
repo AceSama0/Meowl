@@ -9,7 +9,7 @@ using UnityEngine.SceneManagement;
 public class Player : MonoBehaviour
 {
     bool idleing;
-    [SerializeField]float footStepDuration = 0.01f;
+    [SerializeField] float footStepDuration = 0.01f;
     bool isPlayingFootSteps;
     public string animName = "isWalking";
     public bool canMove = true;
@@ -37,6 +37,11 @@ public class Player : MonoBehaviour
 
     [SerializeField] SpriteRenderer spriteRenderer;
     [SerializeField] Animator animator;
+    [Header("QTE")]
+    public bool isQTEActive = false;
+    private float qteStartTime;
+    private float qteDuration = 1.0f;
+    public bool success = false;
 
     void Awake()
     {
@@ -59,6 +64,10 @@ public class Player : MonoBehaviour
     }
     void Update()
     {
+        if (isQTEActive)
+        {
+            HandleQTEInput();
+        }
         if (canMove)
         {
             speed = basicSpeed;
@@ -80,7 +89,47 @@ public class Player : MonoBehaviour
         }
 
     }
+    private void HandleQTEInput()
+    {
 
+        if (Time.time > qteStartTime + qteDuration)
+        {
+
+            isQTEActive = false;
+            OnQTEFailed();
+            return;
+        }
+
+
+        if (Input.GetMouseButtonDown(1))
+        {
+
+            isQTEActive = false;
+            OnQTESuccess();
+        }
+    }
+
+
+    public void StartQTE(float duration)
+    {
+        if (isQTEActive) return;
+
+        qteDuration = duration;
+        isQTEActive = true;
+        qteStartTime = Time.time;
+
+    }
+
+
+    private void OnQTESuccess()
+    {
+        success = true;
+    }
+
+    private void OnQTEFailed()
+    {
+        success = false;
+    }
 
     void LightOnOff()
     {

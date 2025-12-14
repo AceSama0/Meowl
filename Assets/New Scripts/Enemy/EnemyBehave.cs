@@ -1,21 +1,20 @@
 using System.Collections;
-using System.Linq;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 enum State
 {
     Chase,
     Roam,
-    Search, 
+    Search,
     Dash,
     Flee,
     Die,
+    QTE
 }
 
 public class EnemyBehave : MonoBehaviour
 {
+    float originalSpeed;
     Player player;
     bool soundPlayed = false;
     public Vector2 lastSeen;
@@ -26,37 +25,40 @@ public class EnemyBehave : MonoBehaviour
     WayPointMover wayPointMover;
     State state;
     Rigidbody2D rb;
+    SpriteRenderer spriteRenderer;
+
+    private LayerMask visionMask;
+    private bool canSeePlayer;
+    private float distanceToPlayer;
+    private float visionCheckTimer;
+    private const float VISION_CHECK_INTERVAL = 0.1f;
 
     void Awake()
     {
+        spriteRenderer = GetComponent<SpriteRenderer>();
         rb = GetComponent<Rigidbody2D>();
         player = FindAnyObjectByType<Player>();
         enemy = GetComponent<Enemy>();
         wayPointMover = GetComponent<WayPointMover>();
         state = State.Roam;
+        originalSpeed = wayPointMover.movementSpeed;
+
+        visionMask = LayerMask.GetMask("Player", "Wall");
     }
 
     void Update()
     {
-        State newState;
-        
-        if (ChaseDistance() < 10f && SeesPlayer() && player.lightTime > 0)
+        visionCheckTimer += Time.deltaTime;
+        if (visionCheckTimer >= VISION_CHECK_INTERVAL)
         {
-            newState = State.Flee;
+            visionCheckTimer = 0f;
+            distanceToPlayer = Vector2.Distance(transform.position, player.transform.position);
+            canSeePlayer = CheckSeesPlayer();
         }
-        else if (ChaseDistance() < 5f && SeesPlayer() && enemy.canDash)
-        {
-            newState = State.Dash;
-        }
-        else if (ChaseDistance() < 10f && SeesPlayer())
-        {
-            newState = State.Chase;
-            lastSeen = player.transform.position;
-        }
-        else
-        {
-            newState = State.Roam;
-        }
+
+        spriteRenderer.enabled = canSeePlayer;
+
+        State newState = DetermineState();
 
         if (newState != state)
         {
@@ -67,27 +69,66 @@ public class EnemyBehave : MonoBehaviour
 
         HandleStateAction(state);
     }
-    
+
+    private State DetermineState()
+    {
+        // Flee state'indeyken oyuncuyu görse bile kaçmaya devam et
+        if (state == State.Flee && hasFled && distanceToPlayer > 15f)
+        {
+            return State.Roam; // Uzaklaştıysa normal patrol'e dön
+        }
+        else if (state == State.Flee && hasFled)
+        {
+            return State.Flee; // Kaçmaya devam et
+        }
+
+        // QTE state'indeyken başka state'e geçme
+        if (state == State.QTE)
+        {
+            return State.QTE;
+        }
+
+        if (distanceToPlayer < 10f && canSeePlayer && player.lightTime > 0)
+        {
+            return State.Flee;
+        }
+        else if (distanceToPlayer < 2f && canSeePlayer && !player.isQTEActive)
+        {
+            return State.QTE;
+        }
+        else if (distanceToPlayer < 5f && canSeePlayer && enemy.canDash)
+        {
+            return State.Dash;
+        }
+        else if (distanceToPlayer < 10f && canSeePlayer)
+        {
+            lastSeen = player.transform.position;
+            return State.Chase;
+        }
+        else
+        {
+            return State.Roam;
+        }
+    }
+
     private void HandleStateExit(State exitingState)
     {
     }
-    
+
     private void HandleStateEnter(State enteringState)
     {
         if (enteringState == State.Roam)
         {
-            
             if (rb != null)
             {
                 rb.linearVelocity = Vector2.zero;
                 rb.bodyType = RigidbodyType2D.Kinematic;
             }
             wayPointMover.canMove = true;
-            wayPointMover.ResumeMovement(); 
+            wayPointMover.ResumeMovement();
         }
         else if (enteringState == State.Chase || enteringState == State.Dash || enteringState == State.Flee)
         {
-            
             if (rb != null)
             {
                 rb.bodyType = RigidbodyType2D.Dynamic;
@@ -95,95 +136,98 @@ public class EnemyBehave : MonoBehaviour
             }
             wayPointMover.canMove = false;
         }
-        
-        
+        else if (enteringState == State.QTE)
+        {
+            // QTE'yi sadece bir kere başlat
+            player.StartQTE(1.0f);
+            enemy.canMove = false;
+            wayPointMover.canMove = false;
+
+            if (rb != null)
+            {
+                rb.linearVelocity = Vector2.zero; // Düşmanı durdur
+                rb.bodyType = RigidbodyType2D.Dynamic;
+            }
+        }
+
         switch (enteringState)
         {
             case State.Flee:
-                hasFled = false; 
+                hasFled = false;
                 break;
         }
     }
-    
-    
+
     private void HandleStateAction(State currentState)
     {
-        
         enemy.canMove = false;
         wayPointMover.canMove = false;
 
         switch (currentState)
         {
             case State.Roam:
+                wayPointMover.movementSpeed = originalSpeed;
                 enemy.canDash = true;
                 soundPlayed = false;
                 hasFled = false;
-                wayPointMover.canMove = true; 
+                wayPointMover.canMove = true;
                 break;
-                
+
             case State.Chase:
                 if (gameObject.name == "Mother" && !soundPlayed) SoundEffectManager.Play("chaseMother");
                 if (gameObject.name == "Daughter" && !soundPlayed) SoundEffectManager.Play("success");
                 soundPlayed = true;
-                enemy.canMove = true; 
+                enemy.canMove = true;
                 break;
-                
+
             case State.Dash:
-                enemy.canMove = true; 
+                enemy.canMove = true;
+                break;
+
+            case State.QTE:
+                // QTE bitmesini bekle
+                if (!player.isQTEActive)
+                {
+                    if (player.success)
+                    {
+                        // Başarılı - düşman kaçsın (Flee)
+                        state = State.Flee;
+                        player.success = false;
+                    }
+                    else
+                    {
+                        
+                        UnityEngine.SceneManagement.SceneManager.LoadScene("KızÖlüm");
+                    }
+                }
                 break;
 
             case State.Flee:
                 if (!hasFled)
                 {
                     wayPointMover.canMove = true;
-                    
-                    
+                    wayPointMover.movementSpeed = 10f;
                     wayPointMover.currentWayPointIndex -= 3;
                     if (wayPointMover.currentWayPointIndex < 0)
                     {
                         wayPointMover.currentWayPointIndex = 0;
                     }
-                    wayPointMover.ResumeMovement(); 
-
+                    wayPointMover.ResumeMovement();
                     hasFled = true;
                 }
-                wayPointMover.canMove = true; 
+                wayPointMover.canMove = true;
                 break;
 
             case State.Die:
-                
                 break;
         }
     }
 
-
-    float ChaseDistance()
+    private bool CheckSeesPlayer()
     {
-        return Vector2.Distance(transform.position, player.transform.position);
-    }
-
-    public bool SeesPlayer()
-    {
-        LayerMask mask = LayerMask.GetMask("Player", "Wall");
         Vector2 direction = (player.transform.position - transform.position).normalized;
-        
-        
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, direction, 5f, mask); 
-        
-        if (hit.collider != null)
-        {
-            if (hit.collider.CompareTag("Player"))
-            {
-                return true;
-            }
-            else
-            {
-                return false; 
-            }
-        }
-        else
-        {
-            return false;
-        }
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, direction, 15f, visionMask);
+
+        return hit.collider != null && hit.collider.CompareTag("Player");
     }
 }

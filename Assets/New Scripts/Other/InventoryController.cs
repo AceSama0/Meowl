@@ -32,7 +32,6 @@ public class InventoryController : MonoBehaviour
 
         isInitialized = true;
     }
-
     public bool AddItem(GameObject itemPrefab)
     {
         if (!isInitialized)
@@ -44,6 +43,7 @@ public class InventoryController : MonoBehaviour
 
             if (slot != null && slot.currentImage == null)
             {
+                SoundEffectManager.Play("deneme");
                 GameObject item = Instantiate(itemPrefab, slot.transform);
                 item.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
                 slot.currentImage = item;
@@ -85,6 +85,28 @@ public class InventoryController : MonoBehaviour
         List<InventorySaveData> currentItems = GetInventoryItems();
 
         SetIventortyItems(currentItems);
+    }
+    public void RemoveItemByID(int itemID)
+    {
+ 
+        foreach (Transform slotTransform in inventoryPanel.transform)
+        {
+            SlotScripts slot = slotTransform.GetComponent<SlotScripts>();
+
+            if (slot != null && slot.currentImage != null)
+            {
+                Item item = slot.currentImage.GetComponent<Item>();
+                if (item != null && item.ID == itemID)
+                {
+                    Destroy(slot.currentImage);
+
+
+                    slot.currentImage = null;
+
+                    return;
+                }
+            }
+        }
     }
 
 

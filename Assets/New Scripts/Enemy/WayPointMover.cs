@@ -5,13 +5,13 @@ public class WayPointMover : MonoBehaviour
 {
     [SerializeField] Transform wayPointParent;
     public bool canMove = true;
-    [SerializeField] public float movementSpeed = 2f;
+    public float movementSpeed = 2f;
     [SerializeField] float waitTime = 1f;
     public bool loopWayPoints = true;
     [SerializeField] public Transform[] wayPoints;
     public int currentWayPointIndex;
     private bool isWaiting;
-    
+
     void Start()
     {
         wayPoints = new Transform[wayPointParent.childCount];
@@ -23,7 +23,7 @@ public class WayPointMover : MonoBehaviour
 
     }
 
-    void FixedUpdate()
+    void Update()
     {
         if (canMove)
         {
@@ -43,10 +43,10 @@ public class WayPointMover : MonoBehaviour
 
     void MoveToWayPoint()
     {
-        Transform target = wayPoints[currentWayPointIndex];
+        Transform target = wayPoints[currentWayPointIndex]; 
 
         transform.position = Vector2.MoveTowards(transform.position, target.transform.position, movementSpeed * Time.deltaTime);
-        if (Vector2.Distance(transform.position, target.transform.position) < 0.1f)
+        if (!isWaiting && Vector2.Distance(transform.position, target.transform.position) < 0.1f)
         {
             StartCoroutine(WaitAtWayPoint());
         }

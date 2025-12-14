@@ -6,7 +6,6 @@ public class StartCutScene : MonoBehaviour
     [SerializeField] GameObject cutScene1;
     bool cutScenehappened = false;
     
-
     void Awake()
     {
         player = FindAnyObjectByType<Player>();

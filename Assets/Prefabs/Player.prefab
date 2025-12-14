@@ -107,11 +107,11 @@ GameObject:
   - component: {fileID: 7192512788436291026}
   - component: {fileID: 8989387354743324769}
   - component: {fileID: 4569967921478700606}
-  - component: {fileID: 7248666811177374610}
   - component: {fileID: 6580880146922497763}
   - component: {fileID: 863113337621856446}
   - component: {fileID: 3859633116302989553}
   - component: {fileID: 8266219218699149488}
+  - component: {fileID: 1391335114379355880}
   m_Layer: 3
   m_Name: Player
   m_TagString: Player
@@ -129,8 +129,8 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0.78, y: -11.65, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 2, y: 2, z: 2}
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 9141777906446461528}
   - {fileID: 8159223767287210642}
@@ -159,7 +159,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 4294967295
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10306, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -179,13 +179,13 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 1
-  m_Sprite: {fileID: -6367560908665664636, guid: 40de9a8703e2e5a47882b0b86451c741, type: 3}
+  m_SortingOrder: 5
+  m_Sprite: {fileID: 6234176133674011997, guid: e9b56ea226a8d6141a4d94705cc0def7, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 0.40625, y: 1}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -203,6 +203,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5c7e38eb7d1c8c640be357dadba12c07, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  footStepDuration: 0.35
+  animName: isWalking
+  canMove: 1
   lightWayPoints:
   - {fileID: 4785608023479504982}
   - {fileID: 1952121151087969576}
@@ -210,27 +213,15 @@ MonoBehaviour:
   lightWPIndex: 1
   lightfloat: 10
   lightBool: 1
+  switchHand: 0
   lantern: {fileID: 1886958618930233596}
-  lightTime: 40
+  lightTime: 0
   movement: {x: 0, y: 0}
   speed: 6
   fuels: 0
   rb: {fileID: 6580880146922497763}
   spriteRenderer: {fileID: 8989387354743324769}
   animator: {fileID: 863113337621856446}
---- !u!114 &7248666811177374610
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6122010240261203215}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a1147525391fc454aa1fe8e9ce741fc3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  objectIndex: 0
 --- !u!50 &6580880146922497763
 Rigidbody2D:
   serializedVersion: 5
@@ -314,8 +305,8 @@ CapsuleCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0.0069193244, y: 0.013838589}
-  m_Size: {x: 1.3888386, y: 1.5276772}
+  m_Offset: {x: 0.00023463368, y: -0.019561052}
+  m_Size: {x: 0.38144237, y: 1.0226598}
   m_Direction: 0
 --- !u!114 &8266219218699149488
 MonoBehaviour:
@@ -330,7 +321,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   interactDistance: 1
+  interacting: 0
   currentDirection: 0
+--- !u!114 &1391335114379355880
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6122010240261203215}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1ab55c41ba9f30a4c8ee56af329e23d0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &8295083488753817017
 GameObject:
   m_ObjectHideFlags: 0
@@ -380,7 +384,7 @@ MonoBehaviour:
   m_BlendStyleIndex: 0
   m_FalloffIntensity: 0.633
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Intensity: 0.4
+  m_Intensity: 0.88
   m_LightVolumeIntensity: 1
   m_LightVolumeEnabled: 0
   m_ApplyToSortingLayers: 00000000
@@ -390,9 +394,9 @@ MonoBehaviour:
   m_AlphaBlendOnOverlap: 0
   m_OverlapOperation: 0
   m_NormalMapDistance: 3
-  m_NormalMapQuality: 0
+  m_NormalMapQuality: 2
   m_UseNormalMap: 0
-  m_ShadowsEnabled: 1
+  m_ShadowsEnabled: 0
   m_ShadowIntensity: 0.75
   m_ShadowSoftness: 0.3
   m_ShadowSoftnessFalloffIntensity: 0.5

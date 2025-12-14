@@ -60,8 +60,6 @@ public class PuzzleSetSlots : MonoBehaviour
 
             if (itemFoundInInventory)
             {
-
-
                 GameObject itemPrefab = itemDictionary.GetItemPrefab(requiredID);
                 if (itemPrefab != null)
                 {
@@ -74,7 +72,6 @@ public class PuzzleSetSlots : MonoBehaviour
                         rectTransform.localScale = Vector3.one;
                     }
                 }
-
             }
         }
     }
