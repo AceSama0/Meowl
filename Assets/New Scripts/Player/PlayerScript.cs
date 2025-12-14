@@ -9,7 +9,8 @@ using UnityEngine.SceneManagement;
 public class Player : MonoBehaviour
 {
     bool idleing;
-    [SerializeField] float footStepDuration = 0.01f;
+    private float footStepTimer;
+    [SerializeField] float footStepDuration = 0.2f;
     bool isPlayingFootSteps;
     public string animName = "isWalking";
     public bool canMove = true;
@@ -79,13 +80,25 @@ public class Player : MonoBehaviour
         playerMovement();
         LightOnOff();
 
-        if (rb.linearVelocity.magnitude > 0 && !isPlayingFootSteps)
+        bool isMoving = rb.linearVelocity.magnitude > 0;
+
+        if (isMoving && canMove) 
         {
-            PlayFootSteps();
+            
+            footStepTimer -= Time.deltaTime;
+
+            if (footStepTimer <= 0)
+            {
+                FootSteps();
+                
+                footStepTimer = footStepDuration;
+            }
         }
-        else if (rb.linearVelocity.magnitude == 0)
+
+        
+        if (rb.linearVelocity.magnitude == 0)
         {
-            StopFootSteps();
+            
         }
 
     }
@@ -215,18 +228,6 @@ public class Player : MonoBehaviour
             MusicManager.PauseBackgroundMusic();
             SceneManager.LoadScene("KızÖlüm");
         }
-    }
-
-    void PlayFootSteps()
-    {
-        isPlayingFootSteps = true;
-        InvokeRepeating(nameof(FootSteps), 0, footStepDuration);
-    }
-
-    void StopFootSteps()
-    {
-        isPlayingFootSteps = false;
-        CancelInvoke(nameof(FootSteps));
     }
 
     void FootSteps()

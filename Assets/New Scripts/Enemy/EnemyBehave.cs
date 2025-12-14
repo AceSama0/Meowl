@@ -9,7 +9,6 @@ enum State
     Dash,
     Flee,
     Die,
-    QTE
 }
 
 public class EnemyBehave : MonoBehaviour
@@ -26,7 +25,6 @@ public class EnemyBehave : MonoBehaviour
     State state;
     Rigidbody2D rb;
     SpriteRenderer spriteRenderer;
-
     private LayerMask visionMask;
     private bool canSeePlayer;
     private float distanceToPlayer;
@@ -43,11 +41,13 @@ public class EnemyBehave : MonoBehaviour
         state = State.Roam;
         originalSpeed = wayPointMover.movementSpeed;
 
+        
         visionMask = LayerMask.GetMask("Player", "Wall");
     }
 
     void Update()
     {
+        
         visionCheckTimer += Time.deltaTime;
         if (visionCheckTimer >= VISION_CHECK_INTERVAL)
         {
@@ -58,6 +58,7 @@ public class EnemyBehave : MonoBehaviour
 
         spriteRenderer.enabled = canSeePlayer;
 
+        
         State newState = DetermineState();
 
         if (newState != state)
@@ -70,31 +71,12 @@ public class EnemyBehave : MonoBehaviour
         HandleStateAction(state);
     }
 
+    
     private State DetermineState()
     {
-        // Flee state'indeyken oyuncuyu görse bile kaçmaya devam et
-        if (state == State.Flee && hasFled && distanceToPlayer > 15f)
-        {
-            return State.Roam; // Uzaklaştıysa normal patrol'e dön
-        }
-        else if (state == State.Flee && hasFled)
-        {
-            return State.Flee; // Kaçmaya devam et
-        }
-
-        // QTE state'indeyken başka state'e geçme
-        if (state == State.QTE)
-        {
-            return State.QTE;
-        }
-
         if (distanceToPlayer < 10f && canSeePlayer && player.lightTime > 0)
         {
             return State.Flee;
-        }
-        else if (distanceToPlayer < 2f && canSeePlayer && !player.isQTEActive)
-        {
-            return State.QTE;
         }
         else if (distanceToPlayer < 5f && canSeePlayer && enemy.canDash)
         {
@@ -110,11 +92,9 @@ public class EnemyBehave : MonoBehaviour
             return State.Roam;
         }
     }
-
     private void HandleStateExit(State exitingState)
     {
     }
-
     private void HandleStateEnter(State enteringState)
     {
         if (enteringState == State.Roam)
@@ -136,19 +116,6 @@ public class EnemyBehave : MonoBehaviour
             }
             wayPointMover.canMove = false;
         }
-        else if (enteringState == State.QTE)
-        {
-            // QTE'yi sadece bir kere başlat
-            player.StartQTE(1.0f);
-            enemy.canMove = false;
-            wayPointMover.canMove = false;
-
-            if (rb != null)
-            {
-                rb.linearVelocity = Vector2.zero; // Düşmanı durdur
-                rb.bodyType = RigidbodyType2D.Dynamic;
-            }
-        }
 
         switch (enteringState)
         {
@@ -157,7 +124,6 @@ public class EnemyBehave : MonoBehaviour
                 break;
         }
     }
-
     private void HandleStateAction(State currentState)
     {
         enemy.canMove = false;
@@ -184,24 +150,6 @@ public class EnemyBehave : MonoBehaviour
                 enemy.canMove = true;
                 break;
 
-            case State.QTE:
-                // QTE bitmesini bekle
-                if (!player.isQTEActive)
-                {
-                    if (player.success)
-                    {
-                        // Başarılı - düşman kaçsın (Flee)
-                        state = State.Flee;
-                        player.success = false;
-                    }
-                    else
-                    {
-                        
-                        UnityEngine.SceneManagement.SceneManager.LoadScene("KızÖlüm");
-                    }
-                }
-                break;
-
             case State.Flee:
                 if (!hasFled)
                 {
@@ -222,7 +170,6 @@ public class EnemyBehave : MonoBehaviour
                 break;
         }
     }
-
     private bool CheckSeesPlayer()
     {
         Vector2 direction = (player.transform.position - transform.position).normalized;

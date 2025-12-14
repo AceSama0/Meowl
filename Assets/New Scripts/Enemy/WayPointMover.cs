@@ -23,7 +23,7 @@ public class WayPointMover : MonoBehaviour
 
     }
 
-    void Update()
+    void FixedUpdate()
     {
         if (canMove)
         {
