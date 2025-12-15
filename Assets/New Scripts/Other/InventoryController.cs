@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
-using UnityEngine.Rendering; 
+using UnityEngine.Rendering; // WaitForEndOfFrame için
 
 public class InventoryController : MonoBehaviour
 {
@@ -12,166 +12,191 @@ public class InventoryController : MonoBehaviour
     [SerializeField] int slotCount = 15;
 
     private bool isInitialized = false;
-    private bool isRefreshing = false; 
+    
+    // UI Yenileme Durumları
+    public bool isRefreshing = false; // Puzzle bunu okuyacak
+    private bool refreshRequested = false; // Yenileme isteği bayrağı
 
-    void Start()
+    // 🔥 ANA VERİ KAYNAĞI: UI değil, bu liste gerçektir.
+    private List<InventorySaveData> currentInventoryData = new List<InventorySaveData>();
+    
+    // Başlatma Güvenliği
+    private bool isFullyReady = false;
+    public bool IsFullyReady => isFullyReady; // Dışarıdan okunabilir
+    private Queue<GameObject> pendingItems = new Queue<GameObject>(); // Bekleyen itemlar
+
+    void Awake()
     {
-        ItemDictionary = FindAnyObjectByType<ItemDictionary>(); 
+        ItemDictionary = FindAnyObjectByType<ItemDictionary>();
         InitializeInventory();
     }
 
+    void Start()
+    {
+        StartCoroutine(StartupRoutine());
+    }
+    
+    // Oyun başlarken sistemin oturmasını bekler
+    IEnumerator StartupRoutine()
+    {
+        yield return new WaitForEndOfFrame();
+        
+        isFullyReady = true;
+        
+        // Başlangıçta bekleyen item varsa şimdi ekle
+        while (pendingItems.Count > 0)
+        {
+            GameObject item = pendingItems.Dequeue();
+            if (item != null) AddItemInternal(item);
+        }
+    }
 
     void InitializeInventory()
     {
         if (inventoryPanel.transform.childCount > 0)
+        {
+            isInitialized = true;
             return;
+        }
 
         for (int i = 0; i < slotCount; i++)
         {
             Instantiate(slotPrefab, inventoryPanel.transform);
         }
-
         isInitialized = true;
     }
+
+    // 🛑 Her frame'in sonunda sadece 1 kez yenileme yapar.
+    // Bu, "5 tane item üretme" hatasını engeller.
+    void LateUpdate()
+    {
+        if (refreshRequested && !isRefreshing)
+        {
+            refreshRequested = false;
+            StartCoroutine(SafeLoadInventory());
+        }
+    }
     
-    
+    // ========================================================================
+    // PUBLIC METOTLAR
+    // ========================================================================
+
+    // Dışarıdan Item Ekleme Çağrısı
     public bool AddItem(GameObject itemPrefab)
     {
-        if (!isInitialized)
-            InitializeInventory();
-
-        foreach (Transform slotTransform in inventoryPanel.transform)
+        // Sistem hazır değilse kuyruğa at
+        if (!isFullyReady)
         {
-            SlotScripts slot = slotTransform.GetComponent<SlotScripts>();
-
-            if (slot != null && slot.currentImage == null)
-            {
-                SoundEffectManager.Play("deneme");
-                GameObject item = Instantiate(itemPrefab, slot.transform);
-                item.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
-                slot.currentImage = item;
-                
-                
-                return true;
-            }
+            pendingItems.Enqueue(itemPrefab);
+            return true;
         }
-
-        Debug.Log("Inventory is full.");
-        return false;
+        return AddItemInternal(itemPrefab);
     }
-
+    
+    // Dışarıdan Yenileme İsteği
+    public void RequestRefreshDisplay()
+    {
+        refreshRequested = true;
+    }
+    
+    // Sadece Veri Listesini Döndürür (UI okumaz)
     public List<InventorySaveData> GetInventoryItems()
     {
-        List<InventorySaveData> invData = new List<InventorySaveData>();
-
-        foreach (Transform slotTransform in inventoryPanel.transform)
-        {
-            SlotScripts slot = slotTransform.GetComponent<SlotScripts>();
-            if (slot != null && slot.currentImage != null)
-            {
-                Item item = slot.currentImage.GetComponent<Item>();
-                if (item != null)
-                {
-                    invData.Add(new InventorySaveData
-                    {
-                        itemID = item.ID,
-                        slotIndex = slotTransform.GetSiblingIndex()
-                    });
-                }
-            }
-        }
-
-        return invData;
+        return new List<InventorySaveData>(currentInventoryData);
     }
-    
-    public void RefreshInventoryDisplay()
-    {
-        if (isRefreshing) return; 
 
-        List<InventorySaveData> currentItems = GetInventoryItems();
-        SetIventortyItems(currentItems);
-    }
-    
     public void RemoveItemByID(int itemID)
     {
-        foreach (Transform slotTransform in inventoryPanel.transform)
+        InventorySaveData itemToRemove = currentInventoryData.Find(data => data.itemID == itemID);
+        if (itemToRemove != null)
         {
-            SlotScripts slot = slotTransform.GetComponent<SlotScripts>();
-
-            if (slot != null && slot.currentImage != null)
-            {
-                Item item = slot.currentImage.GetComponent<Item>();
-                if (item != null && item.ID == itemID)
-                {
-                    Destroy(slot.currentImage);
-                    slot.currentImage = null;
-
-                    return;
-                }
-            }
+            currentInventoryData.Remove(itemToRemove);
+            RequestRefreshDisplay();
         }
     }
-
 
     public void SetIventortyItems(List<InventorySaveData> inventorySaveData)
     {
-        if (inventorySaveData == null)
-        {
-            return;
-        }
-
-        StopAllCoroutines();
-        StartCoroutine(SafeLoadInventory(inventorySaveData));
+        if (inventorySaveData == null) return;
+        currentInventoryData = new List<InventorySaveData>(inventorySaveData);
+        RequestRefreshDisplay();
     }
 
-    //Load Inventory
+    // ========================================================================
+    // PRIVATE MANTIK
+    // ========================================================================
+
+    private bool AddItemInternal(GameObject itemPrefab)
+    {
+        if (!isInitialized) InitializeInventory();
+
+        if (currentInventoryData.Count >= slotCount)
+        {
+            Debug.Log("Inventory is full.");
+            return false;
+        }
+
+        Item itemComponent = itemPrefab.GetComponent<Item>();
+        if (itemComponent == null) return false;
+
+        // Veriyi listeye ekle
+        currentInventoryData.Add(new InventorySaveData
+        {
+            itemID = itemComponent.ID,
+            slotIndex = -1
+        });
+
+        RequestRefreshDisplay();
+        return true;
+    }
+
+    // ========================================================================
+    // UI YENİLEME (Build Güvenli)
+    // ========================================================================
+    
     private const int SLOTS_PER_ROW = 5;
     private const int ROW_ID_RANGE = 5;
-    
-    IEnumerator SafeLoadInventory(List<InventorySaveData> inventorySaveData)
-    {
-        isRefreshing = true; 
 
-        
+    IEnumerator SafeLoadInventory()
+    {
+        isRefreshing = true;
+
+        // 1. Tüm eski slotları sil
         for (int i = inventoryPanel.transform.childCount - 1; i >= 0; i--)
         {
             Destroy(inventoryPanel.transform.GetChild(i).gameObject);
         }
-        
-        
-        int safetyCounter = 0;
-        
-        while (inventoryPanel.transform.childCount > 0 && safetyCounter < 100) 
+
+        // Build'de silme işleminin bitmesini bekle
+        int safety = 0;
+        while (inventoryPanel.transform.childCount > 0 && safety < 100)
         {
-            yield return null; 
-            safetyCounter++;
+            yield return null;
+            safety++;
         }
-        
-        yield return new WaitForEndOfFrame(); 
+        yield return new WaitForEndOfFrame();
 
-        List<InventorySaveData> sortedData = inventorySaveData.OrderBy(data => data.itemID).ToList();
-
+        // 2. Yeni boş slotları oluştur
         for (int i = 0; i < slotCount; i++)
         {
             Instantiate(slotPrefab, inventoryPanel.transform);
         }
+        yield return null; // Slotların UI'da yerleşmesi için bekle
 
-        yield return null; 
+        // 3. Veri listesine göre itemları yerleştir
+        // Listeyi ID'ye göre sıralıyoruz
+        List<InventorySaveData> sortedData = currentInventoryData.OrderBy(data => data.itemID).ToList();
 
-        for (int i = 0; i < sortedData.Count; i++)
+        foreach (var data in sortedData)
         {
-            InventorySaveData data = sortedData[i];
-
             int rowNumber = (Mathf.Max(1, data.itemID) - 1) / ROW_ID_RANGE;
             int columnPositionInRow = (Mathf.Max(1, data.itemID) - 1) % ROW_ID_RANGE;
             int newSlotIndex = (rowNumber * SLOTS_PER_ROW) + columnPositionInRow;
 
-
-            if (newSlotIndex < slotCount)
+            if (newSlotIndex < slotCount && newSlotIndex < inventoryPanel.transform.childCount)
             {
                 Transform slotTransform = inventoryPanel.transform.GetChild(newSlotIndex);
                 SlotScripts slot = slotTransform.GetComponent<SlotScripts>();
-
                 GameObject itemPrefab = ItemDictionary.GetItemPrefab(data.itemID);
 
                 if (itemPrefab != null && slot != null)
@@ -182,7 +207,7 @@ public class InventoryController : MonoBehaviour
                 }
             }
         }
-        
-        isRefreshing = false; // KİLİDİ AÇ: Yenileme bitti
+
+        isRefreshing = false;
     }
 }

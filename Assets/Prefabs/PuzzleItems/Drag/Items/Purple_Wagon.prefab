@@ -106,7 +106,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7836123435923478386, guid: 4243f3d181a89a146a9a4065375adc8e, type: 3}
       propertyPath: Name
-      value: PuzzleItem3
+      value: Purple Wagon
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

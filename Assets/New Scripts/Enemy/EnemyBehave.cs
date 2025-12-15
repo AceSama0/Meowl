@@ -14,7 +14,7 @@ enum State
 public class EnemyBehave : MonoBehaviour
 {
     float originalSpeed;
-    Player player;
+    [SerializeField] Player player;
     bool soundPlayed = false;
     public Vector2 lastSeen;
     Enemy enemy;
@@ -38,7 +38,6 @@ public class EnemyBehave : MonoBehaviour
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
         rb = GetComponent<Rigidbody2D>();
-        player = FindAnyObjectByType<Player>();
         enemy = GetComponent<Enemy>();
         wayPointMover = GetComponent<WayPointMover>();
         state = State.Roam;
@@ -139,7 +138,7 @@ public class EnemyBehave : MonoBehaviour
 
         switch (enteringState)
         {
-            case State.Flee:
+            case State.Flee: 
                 hasFled = false;
                 break;
         }
@@ -170,7 +169,7 @@ public class EnemyBehave : MonoBehaviour
                 enemy.canMove = true;
                 break;
 
-            case State.Flee:
+            case State.Flee: // burayı düzenle
                 if (!hasFled)
                 {
                     wayPointMover.canMove = true;
@@ -187,6 +186,7 @@ public class EnemyBehave : MonoBehaviour
                 break;
 
             case State.Die:
+                
                 break;
         }
     }

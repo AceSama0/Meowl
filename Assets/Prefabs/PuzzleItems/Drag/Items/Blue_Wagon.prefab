@@ -110,7 +110,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7474935610823713979, guid: 35046e139472819408aa7d1f1b1472ef, type: 3}
       propertyPath: Name
-      value: PuzzleItem2
+      value: Blue Wagon
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

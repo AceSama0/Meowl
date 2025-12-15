@@ -17,7 +17,7 @@ GameObject:
   - component: {fileID: -7017799229639811435}
   - component: {fileID: 4607649692802075202}
   m_Layer: 5
-  m_Name: Item
+  m_Name: Red_Wagon
   m_TagString: Item
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -117,7 +117,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ID: 1
-  Name: Apple
+  Name: Red Wagon
 --- !u!212 &-7017799229639811435
 SpriteRenderer:
   m_ObjectHideFlags: 0

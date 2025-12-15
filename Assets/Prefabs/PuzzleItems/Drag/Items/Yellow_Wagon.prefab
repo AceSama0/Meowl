@@ -18,7 +18,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -3380552589626630339, guid: ba3530899fe63464380d490e7fd1033c, type: 3}
       propertyPath: Name
-      value: Banana
+      value: Yellow Wagon
       objectReference: {fileID: 0}
     - target: {fileID: 3075882190137906887, guid: ba3530899fe63464380d490e7fd1033c, type: 3}
       propertyPath: m_Name

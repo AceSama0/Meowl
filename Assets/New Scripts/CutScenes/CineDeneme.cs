@@ -1,5 +1,4 @@
 using System.Collections;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -86,6 +85,8 @@ public class CineDeneme : MonoBehaviour
     IEnumerator Success()
     {
         Destroy(mouseIcon);
+        SpriteRenderer enemySprite = enemy.GetComponent<SpriteRenderer>();
+        enemySprite.flipX = true;
         player.transform.position = transform.position;
         playerLantern.SetActive(true);
         Destroy(lantern);

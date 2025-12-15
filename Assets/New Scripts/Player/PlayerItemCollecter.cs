@@ -3,6 +3,7 @@ using UnityEngine;
 public class PlayerItemCollecter : MonoBehaviour
 {
     private InventoryController inventoryController;
+    private bool isProcessing = false; // Çifte toplamayı önleyen kilit
 
     void Awake()
     {
@@ -11,19 +12,32 @@ public class PlayerItemCollecter : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D collision)
     {
-        if(collision.CompareTag("Item"))
+        if (isProcessing) return; // Zaten işlem yapılıyorsa çık
+
+        if (collision.CompareTag("Item"))
         {
             Item item = collision.GetComponent<Item>();
-            if(item != null)
+            if (item != null)
             {
+                isProcessing = true; // Kilitle
+
+                // AddItem çağrısı içeride Refresh'i tetikler
                 bool itemAdded = inventoryController.AddItem(collision.gameObject);
+
                 if (itemAdded)
                 {
-                    item.Pickup();
+                    item.Pickup(); 
                     Destroy(collision.gameObject);
-                    inventoryController.RefreshInventoryDisplay();
-                }                
+                }
+                
+                // Güvenlik için kısa bir süre sonra kilidi aç
+                Invoke(nameof(ResetProcessing), 0.1f);
             }
         }
+    }
+
+    void ResetProcessing()
+    {
+        isProcessing = false;
     }
 }
