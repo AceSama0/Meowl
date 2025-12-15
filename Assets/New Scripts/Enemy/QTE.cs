@@ -11,7 +11,8 @@ public class QTE : MonoBehaviour
     [SerializeField] GameObject QTEEvent;
     PointerController pC;
     public bool successQTE;
-    
+    [SerializeField] GameObject MouseIcon;
+
     void Update()
     {
         // if(isQTEActive)
@@ -34,6 +35,7 @@ public class QTE : MonoBehaviour
         isQTEActive = true;
         QTEEvent.SetActive(true);
         pC = FindAnyObjectByType<PointerController>();
+        MouseIcon.SetActive(true);
     }
     IEnumerator QTETimer()
     {
@@ -45,13 +47,14 @@ public class QTE : MonoBehaviour
         yield return new WaitForSeconds(QTETime);
         if (successed)
         {
-           FinishQTE(true);
-           successed = false; 
+            FinishQTE(true);
+            successed = false;
         }
         else
         {
             FinishQTE(false);
         }
+        MouseIcon.SetActive(false);
     }
     public void FinishQTE(bool succesful)
     {
@@ -59,11 +62,13 @@ public class QTE : MonoBehaviour
         if (succesful)
         {
             successQTE = true;
+            Debug.Log("QTE başarılı");
         }
         else
         {
             SceneManager.LoadScene("KızÖlüm");
             successQTE = false;
+            Debug.Log("QTE başarısız");
         }
     }
 }

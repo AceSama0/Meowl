@@ -30,6 +30,9 @@ public class EnemyBehave : MonoBehaviour
     private float distanceToPlayer;
     private float visionCheckTimer;
     private const float VISION_CHECK_INTERVAL = 0.1f;
+    [Header("QTE")]
+    bool QTEStarter = false;
+    [SerializeField] GameObject QTE;
 
     void Awake()
     {
@@ -47,6 +50,11 @@ public class EnemyBehave : MonoBehaviour
 
     void Update()
     {
+        if(QTEStarter)
+        {
+            QTE.SetActive(true);
+            
+        }
         SetEnemyLook();
         visionCheckTimer += Time.deltaTime;
         if (visionCheckTimer >= VISION_CHECK_INTERVAL)

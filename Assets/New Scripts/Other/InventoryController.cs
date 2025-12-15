@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
-using UnityEngine.Rendering; // WaitForEndOfFrame için eklendi
+using UnityEngine.Rendering; 
 
 public class InventoryController : MonoBehaviour
 {
@@ -12,7 +12,7 @@ public class InventoryController : MonoBehaviour
     [SerializeField] int slotCount = 15;
 
     private bool isInitialized = false;
-    private bool isRefreshing = false; // Yenileme kilit bayrağı
+    private bool isRefreshing = false; 
 
     void Start()
     {
@@ -34,7 +34,7 @@ public class InventoryController : MonoBehaviour
         isInitialized = true;
     }
     
-    // AddItem metodu sadece item'ı ekler, UI'ı yenilemez.
+    
     public bool AddItem(GameObject itemPrefab)
     {
         if (!isInitialized)
@@ -51,7 +51,7 @@ public class InventoryController : MonoBehaviour
                 item.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
                 slot.currentImage = item;
                 
-                // RefreshInventoryDisplay() Build hatalarını önlemek için burada çağrılmamalıdır.
+                
                 return true;
             }
         }
@@ -86,7 +86,7 @@ public class InventoryController : MonoBehaviour
     
     public void RefreshInventoryDisplay()
     {
-        if (isRefreshing) return; // Zaten yenileniyorsa engelle
+        if (isRefreshing) return; 
 
         List<InventorySaveData> currentItems = GetInventoryItems();
         SetIventortyItems(currentItems);
@@ -130,27 +130,25 @@ public class InventoryController : MonoBehaviour
     
     IEnumerator SafeLoadInventory(List<InventorySaveData> inventorySaveData)
     {
-        isRefreshing = true; // KİLİTLE: Yenileme başladı
+        isRefreshing = true; 
 
-        // 1. Tüm eski slotları ve içindeki itemları sil
+        
         for (int i = inventoryPanel.transform.childCount - 1; i >= 0; i--)
         {
             Destroy(inventoryPanel.transform.GetChild(i).gameObject);
         }
         
-        // 🛑 KRİTİK DÜZELTME: Tüm Destory işlemlerinin bitmesini aktif olarak bekle
+        
         int safetyCounter = 0;
-        // Çocuk sayısı 0'dan büyük olduğu sürece (ve sonsuz döngüden kaçınmak için sayaca bak)
+        
         while (inventoryPanel.transform.childCount > 0 && safetyCounter < 100) 
         {
-            yield return null; // Bir sonraki frame'i bekle
+            yield return null; 
             safetyCounter++;
         }
         
-        // Ekstra güvenlik için bir frame daha bekle
         yield return new WaitForEndOfFrame(); 
 
-        // 2. Veriyi sırala ve yeni slotları oluştur
         List<InventorySaveData> sortedData = inventorySaveData.OrderBy(data => data.itemID).ToList();
 
         for (int i = 0; i < slotCount; i++)
@@ -158,9 +156,8 @@ public class InventoryController : MonoBehaviour
             Instantiate(slotPrefab, inventoryPanel.transform);
         }
 
-        yield return null; // Yeni slotların yerleşmesi için bekle
+        yield return null; 
 
-        // 3. İtemları yerleştir
         for (int i = 0; i < sortedData.Count; i++)
         {
             InventorySaveData data = sortedData[i];

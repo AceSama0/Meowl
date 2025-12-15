@@ -11,7 +11,7 @@ PrefabInstance:
     - target: {fileID: 936397177087212331, guid: 35046e139472819408aa7d1f1b1472ef, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 9123128501793527533, guid: 131e485692e27e84c86170dad18cda85, type: 3}
+      objectReference: {fileID: -2730112764065144870, guid: 655b0186f9f304846bcd3ce360719da0, type: 3}
     - target: {fileID: 2019347177327390017, guid: 35046e139472819408aa7d1f1b1472ef, type: 3}
       propertyPath: m_Name
       value: PuzzleItem Variant 1
@@ -19,7 +19,7 @@ PrefabInstance:
     - target: {fileID: 2896474033175962899, guid: 35046e139472819408aa7d1f1b1472ef, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 9123128501793527533, guid: 131e485692e27e84c86170dad18cda85, type: 3}
+      objectReference: {fileID: -2730112764065144870, guid: 655b0186f9f304846bcd3ce360719da0, type: 3}
     - target: {fileID: 2896474033175962899, guid: 35046e139472819408aa7d1f1b1472ef, type: 3}
       propertyPath: m_WasSpriteAssigned
       value: 1
@@ -34,27 +34,27 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6384102709208835045, guid: 35046e139472819408aa7d1f1b1472ef, type: 3}
       propertyPath: m_AnchorMax.x
-      value: 0.5
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6384102709208835045, guid: 35046e139472819408aa7d1f1b1472ef, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0.5
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6384102709208835045, guid: 35046e139472819408aa7d1f1b1472ef, type: 3}
       propertyPath: m_AnchorMin.x
-      value: 0.5
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6384102709208835045, guid: 35046e139472819408aa7d1f1b1472ef, type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0.5
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6384102709208835045, guid: 35046e139472819408aa7d1f1b1472ef, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 100
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6384102709208835045, guid: 35046e139472819408aa7d1f1b1472ef, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 100
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6384102709208835045, guid: 35046e139472819408aa7d1f1b1472ef, type: 3}
       propertyPath: m_LocalPosition.x

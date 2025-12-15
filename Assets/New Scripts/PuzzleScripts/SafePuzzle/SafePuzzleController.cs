@@ -1,15 +1,21 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 
-public class SafePuzzleController : MonoBehaviour
+public class SafePuzzleController : MonoBehaviour , IPointerClickHandler
 {
     Lock[] locks;
     [SerializeField] GameObject puzzleUI;
     SafeOpen safeOpen;
     public bool IsPuzzleCompleted { get; private set; }
-    void Start()
+    void Awake()
     {
         safeOpen = FindAnyObjectByType<SafeOpen>();
         locks = FindObjectsOfType<Lock>();
+    }
+    
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        throw new System.NotImplementedException();
     }
 
     public void CheckPuzzleCompletion()
@@ -54,4 +60,6 @@ public class SafePuzzleController : MonoBehaviour
         SoundEffectManager.Play("walking");  
         Debug.Log("Kasa Şifresi Bulunamadı");
     }
+
+    
 }

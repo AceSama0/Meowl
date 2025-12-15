@@ -6,14 +6,18 @@ public class SafeOpen : MonoBehaviour , IPointerDownHandler , IPointerUpHandler
 {
     SafePuzzleController safePuzzleController;
     public bool touchDedected = false ;
+    Animator animator;
+
     private void Awake() 
     {
+        animator = GetComponent<Animator>();
         safePuzzleController = FindAnyObjectByType<SafePuzzleController>();
     }
 
     public void OnPointerDown(PointerEventData eventData)
     {
         StartCoroutine(SuccessLockAnimation());
+        
         
         //animasyonlar
     }
@@ -22,6 +26,7 @@ public class SafeOpen : MonoBehaviour , IPointerDownHandler , IPointerUpHandler
     {
         
         touchDedected = false;
+        animator.SetBool("open" ,false);
         
         //animasyonlar
     }
@@ -30,7 +35,8 @@ public class SafeOpen : MonoBehaviour , IPointerDownHandler , IPointerUpHandler
     {
         touchDedected = true;
         // SoundEffectManager.Play("walking"); // Buraya kasa zımbırtısını döndürme gelecek
-        yield return new WaitForSeconds(1);
+        animator.SetBool("open", true);
+        yield return new WaitForSeconds(2);
         safePuzzleController.CheckPuzzleCompletion();
     }
     
