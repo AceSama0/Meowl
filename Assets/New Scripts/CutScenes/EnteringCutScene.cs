@@ -4,38 +4,19 @@ using UnityEngine;
 
 public class EnteringCutScene : MonoBehaviour
 {
-    [Header("Targets")]
-    [SerializeField] Transform cameraFollow;   
-    [SerializeField] Transform cameraTarget;   
-    [SerializeField] Transform cameraTarget1;  
-    [SerializeField] Transform cameraTarget2;  
-
-
-    [Header("Settings")]
-    [SerializeField] float moveSpeed = 5f; 
-    [SerializeField] float waitDuration = 2f;   
-    [SerializeField] string doorSoundName = "door"; 
-
+    [SerializeField] Transform cameraFollow, cameraTarget, cameraTarget1, cameraTarget2, playerTransform;
+    Player player;
+    [SerializeField] float speed = 0.5f;
     private CinemachineCamera vCam;
-    private Player player;
-    private WaitForSeconds wait; 
 
     void Awake()
     {
         vCam = FindAnyObjectByType<CinemachineCamera>();
         player = FindAnyObjectByType<Player>();
-
-
-        wait = new WaitForSeconds(waitDuration);
     }
-
     void Start()
     {
-
-        if (vCam != null && player != null && cameraFollow != null)
-        {
-            StartCoroutine(StartCutScene());
-        }
+        StartCoroutine(StartCutScene());
     }
 
     IEnumerator StartCutScene()
@@ -43,39 +24,35 @@ public class EnteringCutScene : MonoBehaviour
         player.canMove = false;
         vCam.Follow = cameraFollow;
 
-        cameraFollow.position = player.transform.position;
 
-        yield return wait; 
+        yield return new WaitForSeconds(2);
 
         yield return StartCoroutine(Move(cameraTarget));
-        yield return wait;
+
+        yield return new WaitForSeconds(2);
 
         yield return StartCoroutine(Move(cameraTarget1));
-        yield return wait;
+
+        yield return new WaitForSeconds(2);
 
         yield return StartCoroutine(Move(cameraTarget2));
-        yield return wait;
 
-        SoundEffectManager.Play(doorSoundName);
+        yield return new WaitForSeconds(2);
 
-        
-        vCam.Follow = player.transform;
+        SoundEffectManager.Play("door");
 
+        vCam.Follow = playerTransform;
         player.canMove = true;
+
         enabled = false;
     }
 
     IEnumerator Move(Transform target)
     {
-        while (Vector3.Distance(cameraFollow.position, target.position) > 0.05f)
-        {    
-            cameraFollow.position = Vector3.MoveTowards(
-                cameraFollow.position,
-                target.position,
-                moveSpeed * Time.deltaTime
-            );
+        while (Vector2.Distance(cameraFollow.position, target.position) > 0.1f)
+        {
+            cameraFollow.position = Vector2.MoveTowards(cameraFollow.position, target.position, speed * Time.deltaTime);
             yield return null;
         }
-        cameraFollow.position = target.position;
     }
 }
