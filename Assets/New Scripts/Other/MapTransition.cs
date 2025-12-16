@@ -24,7 +24,7 @@ public class MapTransition : MonoBehaviour
     [SerializeField] GameObject Animation;
 
     [Header("Camera")]
-    [SerializeField] float cameraSize;
+    
     private CinemachineConfiner2D confiner;
     private CinemachineCamera vCam;
 

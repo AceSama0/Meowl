@@ -185,8 +185,8 @@ public class EnemyBehave : MonoBehaviour
                 wayPointMover.canMove = true;
                 break;
 
-            case State.Die:
-                
+            case State.Die: //burayı düzenle flee ne olur ne olmaz
+                    
                 break;
         }
     }

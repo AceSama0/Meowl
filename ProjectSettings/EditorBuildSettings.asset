@@ -14,30 +14,12 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/End.unity
     guid: 08495a47eb416c947897b5192dc72f68
-  - enabled: 0
-    path: Assets/Scenes/Kitchen.unity
-    guid: 80f608a2b76c878439d37160e60fb498
-  - enabled: 1
-    path: Assets/Scenes/Corridor.unity
-    guid: b4cfe4f82cdae964f8dab9291d8d44bb
-  - enabled: 0
-    path: Assets/Scenes/Room1.unity
-    guid: d2221d074ef5c324e80944965dd9e011
-  - enabled: 0
-    path: Assets/Scenes/Room3.unity
-    guid: 78a6f5bf751f91a40ae6d73ad2144f21
-  - enabled: 0
-    path: Assets/Scenes/Room4.unity
-    guid: c00289a2023c37c44953704c95dbc8fd
-  - enabled: 0
-    path: Assets/Scenes/Room5.unity
-    guid: 9e027d4496677b24196af81139e291f3
-  - enabled: 1
-    path: "Assets/Scenes/K\u0131z\xD6l\xFCm.unity"
-    guid: bb55a7f114903274cb7fa7e4fcf691c7
   - enabled: 1
     path: Assets/Scenes/Credits.unity
     guid: 8f3a2ff1f5508f74fb07f23c6c154e1f
+  - enabled: 1
+    path: "Assets/Scenes/K\u0131z\xD6l\xFCm.unity"
+    guid: bb55a7f114903274cb7fa7e4fcf691c7
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   m_UseUCBPForAssetBundles: 0

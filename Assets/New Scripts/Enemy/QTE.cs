@@ -15,13 +15,17 @@ public class QTE : MonoBehaviour
 
     void Update()
     {
-        // if(isQTEActive)
-        // {
-        //     if(pC.success)
-        //     {
-        //         FinishQTE();
-        //     }
-        // }
+        if(isQTEActive)
+        {
+            if(pC.success)
+            {
+                FinishQTE(true);
+            }
+            else
+            {
+                FinishQTE(false);
+            }
+        }
     }
     void OnTriggerEnter2D(Collider2D other)
     {

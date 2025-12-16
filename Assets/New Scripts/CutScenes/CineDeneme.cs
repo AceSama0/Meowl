@@ -1,11 +1,12 @@
 using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class CineDeneme : MonoBehaviour
 {
     [SerializeField] Transform target, enemyTarget, enemyEscape;
-    [SerializeField] GameObject lantern, enemy, playerLantern, mouseIcon;
+    [SerializeField] GameObject lantern, enemy, playerLantern, mouseIcon , lanternLight;
     Animator animator;
     Player player;
     private const string IS_WALKING_PARAM = "isWalking";
@@ -35,7 +36,8 @@ public class CineDeneme : MonoBehaviour
 
     IEnumerator RunCutsceneMovement()
     {
-
+        player.enabled = false;
+        Destroy(lanternLight);
         MusicManager.PauseBackgroundMusic();
         lantern.SetActive(true);
         playerLantern.SetActive(false);
@@ -73,7 +75,7 @@ public class CineDeneme : MonoBehaviour
         {
             enemy.transform.position = Vector2.MoveTowards(
                 enemy.transform.position,
-                target.position,
+                transform.position,
                 5f * Time.deltaTime
             );
 
@@ -87,6 +89,7 @@ public class CineDeneme : MonoBehaviour
         Destroy(mouseIcon);
         SpriteRenderer enemySprite = enemy.GetComponent<SpriteRenderer>();
         enemySprite.flipX = true;
+        player.enabled = true;
         player.transform.position = transform.position;
         playerLantern.SetActive(true);
         Destroy(lantern);
@@ -106,6 +109,7 @@ public class CineDeneme : MonoBehaviour
         Destroy(enemy);
         player.GetComponent<SpriteRenderer>().enabled = true;
         Destroy(gameObject);
+        
     }
 
     IEnumerator EnemyGettingCloser()
@@ -157,4 +161,6 @@ public class CineDeneme : MonoBehaviour
         }
         Destroy(mouseIcon);
     }
+
+    
 }

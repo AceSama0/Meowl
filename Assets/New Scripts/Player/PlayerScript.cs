@@ -1,6 +1,4 @@
 using System.Collections;
-using JetBrains.Annotations;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.SceneManagement;
@@ -60,7 +58,6 @@ public class Player : MonoBehaviour
     {
         lantern.transform.position = lightWayPoints[0].position;
         lantern.pointLightInnerRadius = 5f;
-        StartCoroutine(switchingLight());
     }
     void Update()
     {
