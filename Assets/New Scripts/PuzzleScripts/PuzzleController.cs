@@ -7,9 +7,10 @@ public class PuzzleController : MonoBehaviour
     Player player;
     [SerializeField] GameObject puzzle;
     private InventoryScript inventoryScript;
-    [SerializeField] GameObject finalHint;
+    [SerializeField] MirrorPuzzleSuccesed finalHint;
     void Awake()
     {
+        finalHint = GetComponent<MirrorPuzzleSuccesed>();
         inventoryScript = FindAnyObjectByType<InventoryScript>();
         player = FindAnyObjectByType<Player>();
     }
@@ -23,6 +24,7 @@ public class PuzzleController : MonoBehaviour
 
         if (allPuzzleSlots == null || allPuzzleSlots.Length == 0)
         {
+            Debug.LogError($"SLOT HATASI: {gameObject.name} için puzzle slotları bulunamadı! Hierarchy kontrol edin.");
             return false;
         }
         return true;
@@ -51,6 +53,7 @@ public class PuzzleController : MonoBehaviour
 
             if (rules == null)
             {
+                Debug.LogError($"KRİTİK HATA: {slot.name} üzerinde PuzzleSlotVerifier yok!");
                 isPuzzleSolved = false;
                 break;
             }
@@ -64,23 +67,26 @@ public class PuzzleController : MonoBehaviour
 
         if (isPuzzleSolved)
         {
+            // Debug.Log("Yanlış yok");
+
             if (puzzle != null)
             {
-                
+                if (finalHint != null)
+                {
+
+                    finalHint.enabled = true;
+                }
                 SoundEffectManager.Play("success");
                 inventoryScript.isAnotherScreenOpened = false;
                 puzzle.SetActive(false);
-                if (finalHint != null)
-                {
-                    finalHint.SetActive(true);
-                }
                 player.canMove = true;
+
             }
             Destroy(gameObject);
         }
         else
         {
-            
+            // Debug.Log("Yanlış var");
         }
     }
 }

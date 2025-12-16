@@ -41,6 +41,7 @@ public class ImageChangerItem : MonoBehaviour
         {
             panel.SetActive(false);
             Destroy(gameObject);
+
         }
     }
 }
