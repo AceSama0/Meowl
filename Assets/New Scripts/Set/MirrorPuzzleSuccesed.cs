@@ -5,9 +5,10 @@ public class MirrorPuzzleSuccesed : MonoBehaviour
 {
     [SerializeField] Image LetterRead, LetterText, LetterButton;
     [SerializeField] Sprite newSprite, imageButtonSprite;
-    [SerializeField] GameObject panel;
+    [SerializeField] GameObject panel,brokenMirror;
     void Start()
     {
+        Destroy(brokenMirror);
         panel.SetActive(true);
         LetterRead.sprite = newSprite;
         LetterText.sprite = newSprite;
@@ -16,9 +17,9 @@ public class MirrorPuzzleSuccesed : MonoBehaviour
 
     void Update()
     {
-        if(Input.GetMouseButton(1))
+        if(Input.GetMouseButtonDown(1))
         {
-            panel.SetActive(false);
+            Destroy(panel);
         }
     }
 }

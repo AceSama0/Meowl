@@ -70,6 +70,7 @@ public class Enemy : MonoBehaviour
     {
         canDash = false;
         isDashing = true;
+        yield return new WaitForSeconds(1);
         rb.linearVelocity = new Vector2(moveDirection.x, moveDirection.y) * dashingSpeed;
         yield return new WaitForSeconds(dashingDuration);
         isDashing = false;
