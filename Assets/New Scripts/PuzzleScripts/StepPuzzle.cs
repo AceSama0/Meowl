@@ -3,16 +3,13 @@ using UnityEngine;
 public class StepPuzzle : MonoBehaviour
 {
     
-    private BreakingWood[] allWoodPieces;
+    [SerializeField] BreakingWood[] allWoodPieces;
     
     
     public bool IsPuzzleCompleted { get; private set; } = false;
 
     void Start()
     {
-        
-        allWoodPieces = FindObjectsOfType<BreakingWood>();
-        
         Debug.Log($"Toplam {allWoodPieces.Length} adet odun parçası bulundu.");
         
         if (allWoodPieces.Length != 5)

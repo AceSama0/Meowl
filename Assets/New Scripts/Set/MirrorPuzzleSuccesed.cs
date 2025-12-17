@@ -6,7 +6,7 @@ public class MirrorPuzzleSuccesed : MonoBehaviour
     [SerializeField] Image LetterRead, LetterText, LetterButton;
     [SerializeField] Sprite newSprite, imageButtonSprite;
     [SerializeField] GameObject panel;
-    void Start()
+    void Awake()
     {
         panel.SetActive(true);
         LetterRead.sprite = newSprite;

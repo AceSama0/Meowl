@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 public class CineDeneme : MonoBehaviour
 {
     [SerializeField] Transform target, enemyTarget, enemyEscape;
-    [SerializeField] GameObject lantern, enemy, playerLantern, mouseIcon , lanternLight;
+    [SerializeField] GameObject lantern, enemy, playerLantern, mouseIcon, lanternLight;
     Animator animator;
     Player player;
     private const string IS_WALKING_PARAM = "isWalking";
@@ -108,9 +108,13 @@ public class CineDeneme : MonoBehaviour
         SoundEffectManager.Play("deneme");
         Destroy(enemy);
         player.GetComponent<SpriteRenderer>().enabled = true;
+        player.animator.SetBool("LanternIdle" , true);
+        player.animName = "LanternWalking";
         Destroy(gameObject);
-        
+
     }
+
+    
 
     IEnumerator EnemyGettingCloser()
     {
@@ -141,7 +145,7 @@ public class CineDeneme : MonoBehaviour
 
     IEnumerator WaitForPlayerAction(float duration)
     {
-        
+
         mouseIcon.SetActive(true);
         float startTime = Time.time;
         failedBool = true;
@@ -162,5 +166,5 @@ public class CineDeneme : MonoBehaviour
         Destroy(mouseIcon);
     }
 
-    
+
 }

@@ -24,14 +24,13 @@ public class MapTransition : MonoBehaviour
     [SerializeField] GameObject Animation;
 
     [Header("Camera")]
-    
+
     private CinemachineConfiner2D confiner;
     private CinemachineCamera vCam;
 
     [Header("BoundryChange")]
     [SerializeField] PolygonCollider2D mapBoundry;
     [SerializeField] float transformInt;
-    [SerializeField] Vector3 cameraPosition;
     [SerializeField] Direction direction;
 
     [Header("CutScene")]
@@ -64,7 +63,7 @@ public class MapTransition : MonoBehaviour
         }
         else if (collision.CompareTag("Enemy"))
         {
-            
+
             HandleEnemyEnter(collision);
             soundPlayed = false;
         }
@@ -93,7 +92,7 @@ public class MapTransition : MonoBehaviour
         if (corridorBool || !isPlayerInside)
         {
             UpdatePlayerPosition(collision.gameObject);
-            if(!soundPlayed && corridorBool)SoundEffectManager.Play("door");
+            if (!soundPlayed && corridorBool) SoundEffectManager.Play("door");
             soundPlayed = true;
             isEnemyInside = true;
 
@@ -148,25 +147,58 @@ public class MapTransition : MonoBehaviour
     IEnumerator SeesDoor()
     {
         player.canMove = false;
-        door.SetActive(true);
-
-
-        if (doorKnob == null)
+        if (door != null)
         {
-            doorKnob = FindAnyObjectByType<DoorKnob>();
+            door.SetActive(true);
+
+            if (doorKnob == null)
+            {
+                doorKnob = FindAnyObjectByType<DoorKnob>();
+            }
+
+            while (doorKnob != null && !doorKnob.openDoor && !Input.GetMouseButtonDown(1))
+            {
+                yield return null;
+            }
+
+            if (doorKnob != null && doorKnob.openDoor)
+            {
+                doorKnob.openDoor = false;
+
+                MapChange();
+
+                if (confiner != null && mapBoundry != null)
+                {
+                    confiner.BoundingShape2D = mapBoundry;
+                }
+
+                UpdatePlayerPosition(player.gameObject);
+                StartCoroutine(TransitionEffect());
+                if (!soundPlayed) SoundEffectManager.Play("door");
+                soundPlayed = true;
+                StartCoroutine(CutSceneShower());
+
+                lockedDoorCoroutine = StartCoroutine(LockedDoor());
+            }
+            else if (Input.GetMouseButtonDown(1))
+            {
+                if (corridorBool)
+                {
+                    isPlayerInside = true;
+                }
+                if (lockedDoorCoroutine != null)
+                {
+                    StopCoroutine(lockedDoorCoroutine);
+                    lockedDoorCoroutine = null;
+                }
+            }
+
+            door.SetActive(false);
+            player.canMove = true;
         }
-
-        while (doorKnob != null && !doorKnob.openDoor && !Input.GetMouseButtonDown(1))
+        else
         {
-            yield return null;
-        }
-
-        if (doorKnob != null && doorKnob.openDoor)
-        {
-            doorKnob.openDoor = false;
-
             MapChange();
-
             if (confiner != null && mapBoundry != null)
             {
                 confiner.BoundingShape2D = mapBoundry;
@@ -174,28 +206,10 @@ public class MapTransition : MonoBehaviour
 
             UpdatePlayerPosition(player.gameObject);
             StartCoroutine(TransitionEffect());
-            if(!soundPlayed) SoundEffectManager.Play("door");
-            soundPlayed = true;
             StartCoroutine(CutSceneShower());
-
-            
-            lockedDoorCoroutine = StartCoroutine(LockedDoor());
-        }
-        else if (Input.GetMouseButtonDown(1))
-        {
-            if (corridorBool)
-            {
-                isPlayerInside = true;
-            }    
-            if (lockedDoorCoroutine != null)
-            {
-                StopCoroutine(lockedDoorCoroutine);
-                lockedDoorCoroutine = null;
-            }
+            player.canMove = true;
         }
 
-        door.SetActive(false);
-        player.canMove = true;
     }
 
     IEnumerator TransitionEffect()
@@ -218,7 +232,7 @@ public class MapTransition : MonoBehaviour
 
             CutSceneObject.SetActive(true);
 
-            
+
             if (cineDeneme == null)
             {
                 cineDeneme = FindAnyObjectByType<CineDeneme>();

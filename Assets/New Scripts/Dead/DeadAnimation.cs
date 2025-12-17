@@ -13,17 +13,11 @@ public class DeadAnimation : MonoBehaviour
     {
         StartCoroutine(RandomDeadAnimation());
     }
-
-    
-    void Update()
-    {
-        
-    }
     IEnumerator RandomDeadAnimation()
     {
         Animation[UnityEngine.Random.Range(0, Animation.Length)].SetActive(true);
         SoundEffectManager.Play("succesed");
-        yield return new WaitForSeconds(3);
+        yield return new WaitForSeconds(1);
         Pause.SetActive(true);
     }
 }

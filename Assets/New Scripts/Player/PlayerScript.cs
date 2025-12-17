@@ -11,20 +11,19 @@ public class Player : MonoBehaviour
     bool isPlayingFootSteps;
     public string animName = "isWalking";
     public bool canMove = true;
+    public bool canRotate = true;
     float basicSpeed;
     private Coroutine activeCoroutine;
     public static Player instance { get; private set; }
     [Header("Lantern")]
     [SerializeField] Transform[] lightWayPoints = new Transform[3];
+    [SerializeField] Transform lanternPosition;
     [SerializeField] int lightWPIndex = 3;
 
     [SerializeField] float lightfloat = 5f;
     [SerializeField] bool lightBool = true;
     [SerializeField] bool switchHand;
-
-
     [SerializeField] Light2D lantern;
-
     public float lightTime = 0;
     [Header("Puzzle")]
     [SerializeField] Vector2 movement;
@@ -34,7 +33,7 @@ public class Player : MonoBehaviour
     [SerializeField] Rigidbody2D rb;
 
     [SerializeField] SpriteRenderer spriteRenderer;
-    [SerializeField] Animator animator;
+    [SerializeField]public Animator animator;
     [Header("QTE")]
     public bool isQTEActive = false;
     private float qteStartTime;
@@ -43,6 +42,7 @@ public class Player : MonoBehaviour
 
     void Awake()
     {
+
         if (instance == null)
         {
             instance = this;
@@ -78,23 +78,23 @@ public class Player : MonoBehaviour
 
         bool isMoving = rb.linearVelocity.magnitude > 0;
 
-        if (isMoving && canMove) 
+        if (isMoving && canMove)
         {
-            
+
             footStepTimer -= Time.deltaTime;
 
             if (footStepTimer <= 0)
             {
                 FootSteps();
-                
+
                 footStepTimer = footStepDuration;
             }
         }
 
-        
+
         if (rb.linearVelocity.magnitude == 0)
         {
-            
+
         }
 
     }
@@ -198,14 +198,26 @@ public class Player : MonoBehaviour
             idleing = true;
         }
 
-        if (inputX == -1)
+        if (canRotate)
         {
-            spriteRenderer.flipX = true;
-        }
-
-        else if (inputX == 1)
-        {
-            spriteRenderer.flipX = false;
+            // Yön sola: inputX < 0
+            if (inputX < 0)
+            {
+                // Eğer sağa bakıyorsak (yani pozitif ölçekteyiz) sola çevir.
+                if (transform.localScale.x > 0)
+                {
+                    transform.localScale = new Vector2(-transform.localScale.x, transform.localScale.y);
+                }
+            }
+           
+            else if (inputX > 0)
+            {
+                
+                if (transform.localScale.x < 0)
+                {
+                    transform.localScale = new Vector2(Mathf.Abs(transform.localScale.x), transform.localScale.y);
+                }
+            }
         }
     }
 
@@ -222,7 +234,8 @@ public class Player : MonoBehaviour
         if (collision.gameObject.CompareTag("Enemy"))
         {
             MusicManager.PauseBackgroundMusic();
-            SceneManager.LoadScene("KızÖlüm");
+            if(collision.gameObject.name == "Daughter") SceneManager.LoadScene("GirlKill");
+            if(collision.gameObject.name == "Mother") SceneManager.LoadScene("MotherKill");
         }
     }
 

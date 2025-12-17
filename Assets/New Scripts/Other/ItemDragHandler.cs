@@ -27,7 +27,7 @@ public class ItemDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
 
         canvasGroup.blocksRaycasts = false;
         canvasGroup.alpha = 0.6f;
-        SoundEffectManager.Play("HoldingMirror");        
+        SoundEffectManager.Play("HoldingMirror");
     }
 
     public void OnDrag(PointerEventData eventData)
@@ -67,42 +67,59 @@ public class ItemDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
 
             if (dropSlotItem != null && dropSlotItem != gameObject)
             {
+                // SWAP işlemi
                 dropSlotItem.transform.SetParent(originalSlot.transform);
                 originalSlot.currentImage = dropSlotItem;
+                Debug.Log($"SWAP: {originalSlot.name} artık {dropSlotItem.name} içeriyor"); // DEBUG
 
-                RectTransform swappedRect = dropSlotItem.GetComponent<RectTransform>();
-                if (swappedRect != null)
-                {
-                    swappedRect.anchoredPosition = Vector2.zero;
-                    swappedRect.sizeDelta = originalSlot.GetComponent<RectTransform>().sizeDelta * 0.9f;
-                    swappedRect.localScale = Vector3.one;
-                }
+                // ... rect transform kodları ...
 
                 transform.SetParent(dropSlot.transform);
                 dropSlot.currentImage = gameObject;
+                Debug.Log($"SWAP: {dropSlot.name} artık {gameObject.name} içeriyor"); // DEBUG
                 FitItemToSlot();
             }
             else
             {
+                // YENİ YERLEŞTIRME
                 if (originalSlot.currentImage == gameObject)
                 {
                     originalSlot.currentImage = null;
+                    Debug.Log($"ESKİ SLOT TEMİZLENDİ: {originalSlot.name}"); // DEBUG
                 }
 
                 transform.SetParent(dropSlot.transform);
                 dropSlot.currentImage = gameObject;
+                Debug.Log($"YENİ YERLEŞTIRME: {dropSlot.name} artık {gameObject.name} içeriyor"); // DEBUG
                 FitItemToSlot();
             }
 
-
+            // DÜZELTME: Her iki slot için de kontrol et
             if (dropSlot.CompareTag("PuzzleSlot") || originalSlot.CompareTag("PuzzleSlot"))
             {
+                // Önce dropSlot'tan ara
                 PuzzleController manager = dropSlot.GetComponentInParent<PuzzleController>();
+
+                // Bulamazsan originalSlot'tan ara
+                if (manager == null)
+                {
+                    manager = originalSlot.GetComponentInParent<PuzzleController>();
+                }
+
+                // Hala bulamazsan tüm sahnede ara (son çare)
+                if (manager == null)
+                {
+                    manager = FindAnyObjectByType<PuzzleController>();
+                }
 
                 if (manager != null)
                 {
-                    // Coroutine'i BAŞLAT
+                    Debug.Log("PuzzleController bulundu, kontrol ediliyor..."); // DEBUG
                     StartCoroutine(CheckPuzzleDelayed(manager));
+                }
+                else
+                {
+                    Debug.LogError("PuzzleController bulunamadı!"); // DEBUG
                 }
             }
         }
@@ -115,13 +132,17 @@ public class ItemDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
 
     IEnumerator CheckPuzzleDelayed(PuzzleController manager)
     {
-        yield return null;
-
+        // Bir frame bekle (UI güncellensin diye)
         yield return null;
 
         if (manager != null)
         {
+            Debug.Log("CheckPuzzleStatus çağrılıyor..."); // DEBUG
             manager.CheckPuzzleStatus();
+        }
+        else
+        {
+            Debug.LogError("Manager null oldu!"); // DEBUG
         }
     }
 

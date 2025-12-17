@@ -22,6 +22,7 @@ public class EnteringCutScene : MonoBehaviour
     IEnumerator StartCutScene()
     {
         player.canMove = false;
+        player.canRotate = false;
         vCam.Follow = cameraFollow;
 
 
@@ -43,6 +44,7 @@ public class EnteringCutScene : MonoBehaviour
 
         vCam.Follow = playerTransform;
         player.canMove = true;
+        player.canRotate = true;
 
         enabled = false;
     }

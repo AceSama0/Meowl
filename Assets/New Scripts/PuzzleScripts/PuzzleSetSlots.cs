@@ -1,16 +1,18 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Rendering;
+using UnityEngine.Rendering; 
 
 public class PuzzleSetSlots : MonoBehaviour
 {
     private ItemDictionary itemDictionary;
     private InventoryController inventoryController;
-    [SerializeField] GameObject PuzzlePieces;
+    
+    [Header("Puzzle Ayarları")]
+    [SerializeField] GameObject PuzzlePieces; 
     [SerializeField] GameObject slotPrefab;
     [SerializeField] int slotCount;
-    [SerializeField] int[] requiredItemIDs;
+    [SerializeField] int[] requiredItemIDs; 
 
     private bool isRefreshing = false;
     private static ItemDictionary cachedItemDictionary;
@@ -23,7 +25,7 @@ public class PuzzleSetSlots : MonoBehaviour
 
         if (cachedInventoryController == null) cachedInventoryController = FindAnyObjectByType<InventoryController>();
         inventoryController = cachedInventoryController;
-
+        
         StartCoroutine(CreateAllSlotsSafely());
     }
 
@@ -52,25 +54,22 @@ public class PuzzleSetSlots : MonoBehaviour
     {
         isRefreshing = true;
         ClearAllItems();
-        yield return null;
-
-        // 🛑 AGRESİF BEKLEME: Envanter tamamen hazır olana kadar bekle
-        while (inventoryController == null || !inventoryController.IsFullyReady)
+        yield return null; 
+        
+        
+        while (inventoryController == null)
         {
-            yield return null; 
+            
+            inventoryController = FindAnyObjectByType<InventoryController>();
+            if (inventoryController == null)
+            {
+                 yield return null; 
+            }
         }
-
-        // 🛑 Envanterde aktif bir yenileme varsa bitmesini bekle
-        while (inventoryController.isRefreshing)
-        {
-            yield return null;
-        }
-
-        // Artık veriyi güvenle çekebiliriz
         List<InventorySaveData> currentInventory = inventoryController.GetInventoryItems();
         Transform puzzleSlotContainer = PuzzlePieces.transform;
 
-        if (currentInventory == null)
+        if (currentInventory == null || currentInventory.Count == 0)
         {
              isRefreshing = false;
              yield break;
@@ -98,25 +97,21 @@ public class PuzzleSetSlots : MonoBehaviour
                         rectTransform.anchoredPosition = Vector2.zero;
                         rectTransform.localScale = Vector3.one;
                     }
-
-                    // Item'ı envanterden sil
-                    inventoryController.RemoveItemByID(requiredID);
+                    inventoryController.RemoveItemByID(requiredID); 
                 }
             }
         }
-        
-        // Envanter UI'ını güncelle
-        inventoryController.RequestRefreshDisplay();
         isRefreshing = false;
     }
 
     IEnumerator CreateAllSlotsSafely()
     {
+        
         for (int i = PuzzlePieces.transform.childCount - 1; i >= 0; i--)
         {
             Destroy(PuzzlePieces.transform.GetChild(i).gameObject);
         }
-        yield return new WaitForEndOfFrame();
+        yield return new WaitForEndOfFrame(); 
 
         for (int i = 0; i < slotCount; i++)
         {
@@ -128,6 +123,7 @@ public class PuzzleSetSlots : MonoBehaviour
 
     private void ClearAllItems()
     {
+        
         Transform puzzleSlotContainer = PuzzlePieces.transform;
         for (int i = 0; i < puzzleSlotContainer.childCount; i++)
         {
@@ -149,26 +145,26 @@ public class PuzzleSetSlots : MonoBehaviour
         for (int i = 0; i < puzzleSlotContainer.childCount; i++)
         {
             Transform slot = puzzleSlotContainer.GetChild(i);
+
             if (slot.childCount > 0)
             {
                 GameObject itemObject = slot.GetChild(0).gameObject;
                 Item itemComponent = itemObject.GetComponent<Item>();
+
                 if (itemComponent != null)
                 {
                     GameObject itemPrefab = itemDictionary.GetItemPrefab(itemComponent.ID);
-                    if (itemPrefab != null) inventoryController.AddItem(itemPrefab);
+                    if (itemPrefab != null) 
+                    {
+                        
+                        inventoryController.AddItem(itemPrefab);
+                    }
                 }
+                
+                Destroy(itemObject);
             }
         }
-        inventoryController.RequestRefreshDisplay();
     }
     
-    public bool CheckForCorrectItem(SlotScripts targetSlot, int requiredItemID)
-    {
-        if (targetSlot == null || targetSlot.currentImage == null) return false;
-        GameObject itemObject = targetSlot.currentImage;
-        Item itemComponent = itemObject.GetComponent<Item>();
-        if (itemComponent != null) return itemComponent.ID == requiredItemID;
-        return false;
-    }
+    // ... (Diğer metotlar aynı kalır) ...
 }

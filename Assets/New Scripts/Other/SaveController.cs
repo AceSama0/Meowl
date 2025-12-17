@@ -13,11 +13,18 @@ public class SaveController : MonoBehaviour
     void Awake()
     {
         InventoryController = FindAnyObjectByType<InventoryController>();
-
+        Scene currentScene = SceneManager.GetActiveScene();
+        string currentSceneName = currentScene.name;
     }
     void Start()
     {
         saveLocation = Path.Combine(Application.persistentDataPath, "savaData.json");
+        Scene currentScene = SceneManager.GetActiveScene();
+        string currentSceneName = currentScene.name;
+        if(currentSceneName == "House")
+        {
+            LoadGame();
+        }
         // Debug.Log("" + saveLocation);
     }
     public void NewGame()
@@ -54,22 +61,13 @@ public class SaveController : MonoBehaviour
         {
 
             SaveData saveData = JsonUtility.FromJson<SaveData>(File.ReadAllText(saveLocation));
-
-            if (InventoryController == null)
-            {
-                NewGame();
-                return;
-            }
-
-
             GameObject.FindGameObjectWithTag("Player").transform.position = saveData.playerTransform;
             FindAnyObjectByType<CinemachineConfiner2D>().BoundingShape2D = GameObject.Find(saveData.mapBoundary).GetComponent<PolygonCollider2D>();
-
-            InventoryController.SetIventortyItems(saveData.InventorySaveData);
+            InventoryController.SetInventoryItems(saveData.InventorySaveData);
         }
         else
         {
-            NewGame();
+            SaveGame();
         }
     }
 
