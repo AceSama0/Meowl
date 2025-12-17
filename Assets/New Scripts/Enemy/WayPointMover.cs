@@ -10,7 +10,7 @@ public class WayPointMover : MonoBehaviour
     public bool loopWayPoints = true;
     [SerializeField] public Transform[] wayPoints;
     public int currentWayPointIndex;
-    private bool isWaiting;
+    public bool isWaiting;
 
     void Start()
     {

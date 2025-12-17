@@ -1,4 +1,5 @@
 using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
 
 enum State
@@ -19,6 +20,7 @@ public class EnemyBehave : MonoBehaviour
     public Vector2 lastSeen;
     Enemy enemy;
     bool hasFled = false;
+    bool settingSprite = true;
 
     [SerializeField] Transform spawnPoint;
     WayPointMover wayPointMover;
@@ -30,12 +32,15 @@ public class EnemyBehave : MonoBehaviour
     private float distanceToPlayer;
     private float visionCheckTimer;
     private const float VISION_CHECK_INTERVAL = 0.1f;
+
     [Header("QTE")]
     bool QTEStarter = false;
     [SerializeField] GameObject QTE;
+    Animator animator;
 
     void Awake()
     {
+        animator = GetComponent<Animator>();
         spriteRenderer = GetComponent<SpriteRenderer>();
         rb = GetComponent<Rigidbody2D>();
         enemy = GetComponent<Enemy>();
@@ -43,18 +48,15 @@ public class EnemyBehave : MonoBehaviour
         state = State.Roam;
         originalSpeed = wayPointMover.movementSpeed;
 
-        
         visionMask = LayerMask.GetMask("Player", "Wall");
     }
 
     void Update()
     {
-        if(QTEStarter)
-        {
-            QTE.SetActive(true);
-            
-        }
-        SetEnemyLook();
+        // Sprite yönünü ayarla (Eğer özel bir durum yoksa)
+        if (settingSprite) SetEnemySprite();
+
+        // Görüş kontrolü (Performans için timer ile)
         visionCheckTimer += Time.deltaTime;
         if (visionCheckTimer >= VISION_CHECK_INTERVAL)
         {
@@ -63,11 +65,11 @@ public class EnemyBehave : MonoBehaviour
             canSeePlayer = CheckSeesPlayer();
         }
 
+        // Oyuncuyu görmüyorsa gizle (İsteğe bağlı bir mekanik gibi duruyor)
         spriteRenderer.enabled = canSeePlayer;
 
-        
+        // State Değişimi
         State newState = DetermineState();
-
         if (newState != state)
         {
             HandleStateExit(state);
@@ -78,9 +80,9 @@ public class EnemyBehave : MonoBehaviour
         HandleStateAction(state);
     }
 
-    void SetEnemyLook()
+    void SetEnemySprite()
     {
-        if(canSeePlayer && player.transform.position.x > transform.position.x)
+        if (canSeePlayer && player.transform.position.x > transform.position.x)
         {
             spriteRenderer.flipX = false;
         }
@@ -90,32 +92,49 @@ public class EnemyBehave : MonoBehaviour
         }
     }
 
-    
     private State DetermineState()
     {
+        // 1. Ölüm kontrolü (En öncelikli)
+        if (state == State.Roam && wayPointMover.currentWayPointIndex == 0 && wayPointMover.hasStartedPath) 
+        {
+            return State.Die;
+        }
+
+        // 2. Kaçma (Işık varsa)
         if (distanceToPlayer < 10f && canSeePlayer && player.lightTime > 0)
         {
             return State.Flee;
         }
-        else if (distanceToPlayer < 5f && canSeePlayer && enemy.canDash)
+
+        // 3. Atılma (Yakınsa)
+        if (distanceToPlayer < 5f && canSeePlayer && enemy.canDash)
         {
             return State.Dash;
         }
-        else if (distanceToPlayer < 10f && canSeePlayer)
+
+        // 4. Takip
+        if (distanceToPlayer < 10f && canSeePlayer)
         {
             lastSeen = player.transform.position;
             return State.Chase;
         }
-        else
-        {
-            return State.Roam;
-        }
+
+        // 5. Normal devriye
+        return State.Roam;
     }
+
     private void HandleStateExit(State exitingState)
     {
+        if (exitingState == State.Flee)
+        {
+            settingSprite = true; // Kaçma bitince sprite kontrolünü geri ver
+            wayPointMover.movementSpeed = originalSpeed;
+        }
     }
+
     private void HandleStateEnter(State enteringState)
     {
+        // Fizik ayarları
         if (enteringState == State.Roam)
         {
             if (rb != null)
@@ -123,8 +142,6 @@ public class EnemyBehave : MonoBehaviour
                 rb.linearVelocity = Vector2.zero;
                 rb.bodyType = RigidbodyType2D.Kinematic;
             }
-            wayPointMover.canMove = true;
-            wayPointMover.ResumeMovement();
         }
         else if (enteringState == State.Chase || enteringState == State.Dash || enteringState == State.Flee)
         {
@@ -133,28 +150,32 @@ public class EnemyBehave : MonoBehaviour
                 rb.bodyType = RigidbodyType2D.Dynamic;
                 rb.WakeUp();
             }
-            wayPointMover.canMove = false;
         }
 
+        // State'e giriş anında bir kez yapılacak işlemler
         switch (enteringState)
         {
-            case State.Flee: 
-                hasFled = false;
+            case State.Flee:
+                StartCoroutine(FleeProcess());
+                break;
+            case State.Die:
+                if (gameObject.name == "Mother") animator.SetBool("Death", true);
+                StartCoroutine(KillObject());
                 break;
         }
     }
+
     private void HandleStateAction(State currentState)
     {
+        // Varsayılan olarak hareketleri kapat, state içinde gerekirse aç
         enemy.canMove = false;
         wayPointMover.canMove = false;
 
         switch (currentState)
         {
             case State.Roam:
-                wayPointMover.movementSpeed = originalSpeed;
                 enemy.canDash = true;
                 soundPlayed = false;
-                hasFled = false;
                 wayPointMover.canMove = true;
                 break;
 
@@ -169,27 +190,40 @@ public class EnemyBehave : MonoBehaviour
                 enemy.canMove = true;
                 break;
 
-            case State.Flee: // burayı düzenle
-                if (!hasFled)
-                {
-                    wayPointMover.canMove = true;
-                    wayPointMover.movementSpeed = 10f;
-                    wayPointMover.currentWayPointIndex -= 3;
-                    if (wayPointMover.currentWayPointIndex < 0)
-                    {
-                        wayPointMover.currentWayPointIndex = 0;
-                    }
-                    wayPointMover.ResumeMovement();
-                    hasFled = true;
-                }
-                wayPointMover.canMove = true;
-                break;
-
-            case State.Die: //burayı düzenle flee ne olur ne olmaz
-                    
+            case State.Flee:
+                wayPointMover.canMove = true; // Kaçarken wayPointMover hareket eder
                 break;
         }
     }
+
+    IEnumerator FleeProcess()
+    {
+        // Bir kez çalışacak kaçış mekaniği
+        settingSprite = false;
+        
+        // Oyuncunun tersine bak
+        spriteRenderer.flipX = (player.transform.position.x > transform.position.x);
+
+        // Geri gitme mantığı
+        wayPointMover.currentWayPointIndex = Mathf.Max(0, wayPointMover.currentWayPointIndex - 3);
+        if (wayPointMover.isWaiting) wayPointMover.isWaiting = false;
+        
+        wayPointMover.movementSpeed = 20f; // Hızlıca uzaklaş
+        wayPointMover.ResumeMovement();
+
+        yield return new WaitForSeconds(1.5f); // 1.5 saniye boyunca kaç
+
+        wayPointMover.movementSpeed = originalSpeed;
+        settingSprite = true;
+    }
+
+    IEnumerator KillObject()
+    {
+        // Animasyonun bitmesi için 1 saniye bekle ve sonra objeyi yok et/kapat
+        yield return new WaitForSeconds(1f);
+        gameObject.SetActive(false);
+    }
+
     private bool CheckSeesPlayer()
     {
         Vector2 direction = (player.transform.position - transform.position).normalized;
