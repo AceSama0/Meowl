@@ -16,7 +16,7 @@ public class MirrorPuzzleSuccesed : MonoBehaviour
 
     void Update()
     {
-        if(Input.GetMouseButton(1))
+        if(Input.GetMouseButton(0))
         {
             panel.SetActive(false);
         }

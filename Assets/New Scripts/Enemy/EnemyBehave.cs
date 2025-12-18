@@ -15,6 +15,7 @@ enum State
 
 public class EnemyBehave : MonoBehaviour
 {
+    CapsuleCollider2D colliderEnemy;
     float originalSpeed;
     [SerializeField] Player player;
     bool soundPlayed = false;
@@ -41,6 +42,7 @@ public class EnemyBehave : MonoBehaviour
 
     void Awake()
     {
+        colliderEnemy = GetComponent<CapsuleCollider2D>();
         animator = GetComponent<Animator>();
         spriteRenderer = GetComponent<SpriteRenderer>();
         rb = GetComponent<Rigidbody2D>();
@@ -95,6 +97,10 @@ public class EnemyBehave : MonoBehaviour
 
     private State DetermineState()
     {
+        if(state == State.Die)
+        {
+            return State.Spawn;
+        }
         if (state == State.Roam && wayPointMover.currentWayPointIndex == 0 && canSeePlayer && player.lightTime > 0) 
         {
             return State.Die;
@@ -126,7 +132,7 @@ public class EnemyBehave : MonoBehaviour
             wayPointMover.movementSpeed = originalSpeed;
         }
     }
-
+//Die ı düzenle
     private void HandleStateEnter(State enteringState)
     {
         // Fizik ayarları
@@ -221,14 +227,16 @@ public class EnemyBehave : MonoBehaviour
         // Animasyonun bitmesi için 1 saniye bekle ve sonra objeyi yok et/kapat
         yield return new WaitForSeconds(1f);
         animator.SetBool("Death" , true);
+        spriteRenderer.enabled = false;
+        colliderEnemy.enabled = false;  
         // Vector2 deathPosition = 
-        state = State.Spawn;
     }
 
     IEnumerator Spawn()
     {
         yield return new WaitForSeconds(5);
-        gameObject.SetActive(true);
+        spriteRenderer.enabled = true;
+        colliderEnemy.enabled = true;
     }
 
     private bool CheckSeesPlayer()

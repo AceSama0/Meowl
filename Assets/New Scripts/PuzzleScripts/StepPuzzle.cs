@@ -10,7 +10,6 @@ public class StepPuzzle : MonoBehaviour
 
     void Start()
     {
-        Debug.Log($"Toplam {allWoodPieces.Length} adet odun parçası bulundu.");
         
         if (allWoodPieces.Length != 5)
         {

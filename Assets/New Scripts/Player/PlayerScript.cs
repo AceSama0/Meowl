@@ -20,11 +20,11 @@ public class Player : MonoBehaviour
     [SerializeField] Transform lanternPosition;
     [SerializeField] int lightWPIndex = 3;
 
-    [SerializeField] float lightfloat = 5f;
-    [SerializeField] bool lightBool = true;
+    [SerializeField]public float lightfloat = 0;
     [SerializeField] bool switchHand;
     [SerializeField] Light2D lantern;
     public float lightTime = 0;
+    public float lightCount = 0;
     [Header("Puzzle")]
     [SerializeField] Vector2 movement;
     public float speed = 5f;
@@ -33,7 +33,7 @@ public class Player : MonoBehaviour
     [SerializeField] Rigidbody2D rb;
 
     [SerializeField] SpriteRenderer spriteRenderer;
-    [SerializeField]public Animator animator;
+    [SerializeField] public Animator animator;
     [Header("QTE")]
     public bool isQTEActive = false;
     private float qteStartTime;
@@ -57,10 +57,12 @@ public class Player : MonoBehaviour
     void Start()
     {
         lantern.transform.position = lightWayPoints[0].position;
-        lantern.pointLightInnerRadius = 5f;
+        lantern.pointLightInnerRadius = 0f;
+        lightfloat = lantern.pointLightOuterRadius;
     }
     void Update()
     {
+        lantern.pointLightOuterRadius = lightfloat;
         if (isQTEActive)
         {
             HandleQTEInput();
@@ -74,13 +76,14 @@ public class Player : MonoBehaviour
             speed = 0;
         }
         playerMovement();
-        LightOnOff();
+        // LightOnOff();
+        LightBehave();
+        LightTimer();
 
         bool isMoving = rb.linearVelocity.magnitude > 0;
 
         if (isMoving && canMove)
         {
-
             footStepTimer -= Time.deltaTime;
 
             if (footStepTimer <= 0)
@@ -140,43 +143,31 @@ public class Player : MonoBehaviour
         success = false;
     }
 
-    void LightOnOff()
+    void LightBehave()
     {
-        if (lightTime > 0 || lantern.pointLightInnerRadius > 0)
+        if (Input.GetMouseButtonDown(1) && lightCount > 0)
         {
-            lightTime -= 1f * Time.deltaTime;
-        }
-        if (lightTime >= 20f)
-        {
-            lantern.pointLightInnerRadius = 2f;
-        }
-        else if (lightTime < 0f) // alan bitmesi smooth olmalı
-        {
-            lantern.pointLightInnerRadius = 0f;
-        }
-        else if (lightTime < 20f)
-        {
-            LightBreath();
+            lightCount--;
+            lightTime = 10f; 
+            lantern.pointLightInnerRadius = 3f;
         }
     }
-    void LightBreath()
-    {
-        if (lantern.pointLightInnerRadius >= 3f)
-        {
-            lightBool = true;
-        }
-        else if (lantern.pointLightInnerRadius < 2f)
-        {
-            lightBool = false;
-        }
 
-        if (lightBool && lightTime > 0)
+    void LightTimer()
+    {
+        if (lightTime > 0)
         {
-            lantern.pointLightInnerRadius -= lightfloat * Time.deltaTime * 0.5f;
-        }
-        else if (!lightBool && lightTime > 0)
-        {
-            lantern.pointLightInnerRadius += lightfloat * Time.deltaTime * 0.5f;
+            
+            lightTime -= 1 * Time.deltaTime;
+
+            
+            lantern.pointLightInnerRadius = Mathf.Lerp(0, 3f, lightTime / 10f);
+
+            if (lightTime <= 0)
+            {
+                lightTime = 0;
+                lantern.pointLightInnerRadius = 0;
+            }
         }
     }
 
@@ -200,19 +191,18 @@ public class Player : MonoBehaviour
 
         if (canRotate)
         {
-            // Yön sola: inputX < 0
             if (inputX < 0)
             {
-                // Eğer sağa bakıyorsak (yani pozitif ölçekteyiz) sola çevir.
+                
                 if (transform.localScale.x > 0)
                 {
                     transform.localScale = new Vector2(-transform.localScale.x, transform.localScale.y);
                 }
             }
-           
+
             else if (inputX > 0)
             {
-                
+
                 if (transform.localScale.x < 0)
                 {
                     transform.localScale = new Vector2(Mathf.Abs(transform.localScale.x), transform.localScale.y);
@@ -225,17 +215,16 @@ public class Player : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Fuel")) // yakıt
         {
-            lightTime = 40f;
             Debug.Log("Fenere yakıt eklendi");
-            fuels++;
+            lightCount ++;
             Destroy(collision.gameObject);
         }
 
         if (collision.gameObject.CompareTag("Enemy"))
         {
             MusicManager.PauseBackgroundMusic();
-            if(collision.gameObject.name == "Daughter") SceneManager.LoadScene("GirlKill");
-            if(collision.gameObject.name == "Mother") SceneManager.LoadScene("MotherKill");
+            if (collision.gameObject.name == "Daughter") SceneManager.LoadScene("GirlKill");
+            if (collision.gameObject.name == "Mother") SceneManager.LoadScene("MotherKill");
         }
     }
 

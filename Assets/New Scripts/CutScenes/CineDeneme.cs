@@ -61,7 +61,6 @@ public class CineDeneme : MonoBehaviour
         {
             animator.SetBool(IS_WALKING_PARAM, false);
             animator.SetBool("RaiseLanternLeft", true);
-            player.lightTime = 40;
         }
         yield return new WaitForSeconds(1f);
         spriteRenderer.flipX = true;
@@ -81,11 +80,13 @@ public class CineDeneme : MonoBehaviour
 
             yield return null;
         }
-        SceneManager.LoadScene("KızÖlüm");
+        SceneManager.LoadScene("MotherKill");
         Destroy(enemy);
     }
     IEnumerator Success()
     {
+        player.lightTime = 10;
+        player.lightCount++;
         Destroy(mouseIcon);
         SpriteRenderer enemySprite = enemy.GetComponent<SpriteRenderer>();
         enemySprite.flipX = true;
@@ -108,13 +109,14 @@ public class CineDeneme : MonoBehaviour
         SoundEffectManager.Play("deneme");
         Destroy(enemy);
         player.GetComponent<SpriteRenderer>().enabled = true;
-        player.animator.SetBool("LanternIdle" , true);
+        player.lightfloat = 15f;
+        player.animator.SetBool("LanternIdle", true);
         player.animName = "LanternWalking";
         Destroy(gameObject);
 
     }
 
-    
+
 
     IEnumerator EnemyGettingCloser()
     {
