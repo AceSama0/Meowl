@@ -20,11 +20,12 @@ public class Player : MonoBehaviour
     [SerializeField] Transform lanternPosition;
     [SerializeField] int lightWPIndex = 3;
 
-    [SerializeField]public float lightfloat = 0;
+    [SerializeField] public float lightfloat = 0;
+    [SerializeField] bool lightBool = true;
     [SerializeField] bool switchHand;
     [SerializeField] Light2D lantern;
     public float lightTime = 0;
-    public float lightCount = 0;
+    public float lightCount = 1;
     [Header("Puzzle")]
     [SerializeField] Vector2 movement;
     public float speed = 5f;
@@ -56,13 +57,9 @@ public class Player : MonoBehaviour
 
     void Start()
     {
-        lantern.transform.position = lightWayPoints[0].position;
-        lantern.pointLightInnerRadius = 0f;
-        lightfloat = lantern.pointLightOuterRadius;
     }
     void Update()
     {
-        lantern.pointLightOuterRadius = lightfloat;
         if (isQTEActive)
         {
             HandleQTEInput();
@@ -75,8 +72,8 @@ public class Player : MonoBehaviour
         {
             speed = 0;
         }
+
         playerMovement();
-        // LightOnOff();
         LightBehave();
         LightTimer();
 
@@ -84,6 +81,7 @@ public class Player : MonoBehaviour
 
         if (isMoving && canMove)
         {
+
             footStepTimer -= Time.deltaTime;
 
             if (footStepTimer <= 0)
@@ -142,32 +140,40 @@ public class Player : MonoBehaviour
     {
         success = false;
     }
-
     void LightBehave()
     {
         if (Input.GetMouseButtonDown(1) && lightCount > 0)
         {
             lightCount--;
-            lightTime = 10f; 
-            lantern.pointLightInnerRadius = 3f;
+            lightTime = 10f;
         }
     }
-
     void LightTimer()
     {
+        // Dış ışığı (menzili) hep sabit tutuyoruz
+        lantern.pointLightOuterRadius = lightfloat;
+
         if (lightTime > 0)
         {
-            
-            lightTime -= 1 * Time.deltaTime;
+            // Süreyi azalt
+            lightTime -= Time.deltaTime;
 
-            
-            lantern.pointLightInnerRadius = Mathf.Lerp(0, 3f, lightTime / 10f);
+            // Işığın iç halkasını (parlak kısmını) 3'ten 0'a doğru küçült
+            // 10f senin fenerinin toplam yanma süresi
+            float ratio = lightTime / 10f;
+            lantern.pointLightInnerRadius = Mathf.Lerp(0, 3f, ratio);
 
             if (lightTime <= 0)
             {
                 lightTime = 0;
                 lantern.pointLightInnerRadius = 0;
+                // Dış ışık kalsın ama iç ışık 0 olduğu için fener 'bitmiş' gibi görünür
             }
+        }
+        else
+        {
+            // Süre yoksa iç ışık hep 0 kalsın
+            lantern.pointLightInnerRadius = 0;
         }
     }
 
@@ -191,9 +197,10 @@ public class Player : MonoBehaviour
 
         if (canRotate)
         {
+            // Yön sola: inputX < 0
             if (inputX < 0)
             {
-                
+                // Eğer sağa bakıyorsak (yani pozitif ölçekteyiz) sola çevir.
                 if (transform.localScale.x > 0)
                 {
                     transform.localScale = new Vector2(-transform.localScale.x, transform.localScale.y);
@@ -215,8 +222,9 @@ public class Player : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Fuel")) // yakıt
         {
+            lightTime = 40f;
             Debug.Log("Fenere yakıt eklendi");
-            lightCount ++;
+            lightCount++;
             Destroy(collision.gameObject);
         }
 

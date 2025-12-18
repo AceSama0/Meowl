@@ -85,13 +85,12 @@ public class CineDeneme : MonoBehaviour
     }
     IEnumerator Success()
     {
-        player.lightTime = 10;
-        player.lightCount++;
+        player.lightCount ++;
+        player.lightTime = 10f;
         Destroy(mouseIcon);
         SpriteRenderer enemySprite = enemy.GetComponent<SpriteRenderer>();
         enemySprite.flipX = true;
-        player.enabled = true;
-        player.transform.position = transform.position;
+        
         playerLantern.SetActive(true);
         Destroy(lantern);
         while (Vector2.Distance(enemy.transform.position, enemyEscape.position) > 0.1f)
@@ -105,18 +104,22 @@ public class CineDeneme : MonoBehaviour
             yield return null;
         }
         MusicManager.PlayBackgroundMusic(false);
-        player.canMove = true;
+        
         SoundEffectManager.Play("deneme");
         Destroy(enemy);
         player.GetComponent<SpriteRenderer>().enabled = true;
-        player.lightfloat = 15f;
-        player.animator.SetBool("LanternIdle", true);
+        player.animator.SetBool("LanternIdle" , true);
         player.animName = "LanternWalking";
+        
+        player.lightfloat = 12f;
+        player.enabled = true;
+        player.transform.position = transform.position;
+        player.canMove = true;
         Destroy(gameObject);
 
     }
 
-
+    
 
     IEnumerator EnemyGettingCloser()
     {

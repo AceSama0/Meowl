@@ -21,7 +21,6 @@ public class EnemyBehave : MonoBehaviour
     bool soundPlayed = false;
     public Vector2 lastSeen;
     Enemy enemy;
-    bool hasFled = false;
     bool settingSprite = true;
 
     [SerializeField] Transform spawnPoint;
@@ -35,9 +34,6 @@ public class EnemyBehave : MonoBehaviour
     private float visionCheckTimer;
     private const float VISION_CHECK_INTERVAL = 0.1f;
 
-    [Header("QTE")]
-    bool QTEStarter = false;
-    [SerializeField] GameObject QTE;
     Animator animator;
 
     void Awake()
@@ -56,10 +52,11 @@ public class EnemyBehave : MonoBehaviour
 
     void Update()
     {
-        // Sprite yönünü ayarla (Eğer özel bir durum yoksa)
+        // Ölüyken veya doğarken tüm mantığı durdur
+        if (state == State.Die || state == State.Spawn) return;
+
         if (settingSprite) SetEnemySprite();
 
-        // Görüş kontrolü (Performans için timer ile)
         visionCheckTimer += Time.deltaTime;
         if (visionCheckTimer >= VISION_CHECK_INTERVAL)
         {
@@ -68,10 +65,9 @@ public class EnemyBehave : MonoBehaviour
             canSeePlayer = CheckSeesPlayer();
         }
 
-        // Oyuncuyu görmüyorsa gizle (İsteğe bağlı bir mekanik gibi duruyor)
+        // Oyuncuyu görmüyorsa görünmez yap (Mekaniğine göre)
         spriteRenderer.enabled = canSeePlayer;
 
-        // State Değişimi
         State newState = DetermineState();
         if (newState != state)
         {
@@ -86,41 +82,31 @@ public class EnemyBehave : MonoBehaviour
     void SetEnemySprite()
     {
         if (canSeePlayer && player.transform.position.x > transform.position.x)
-        {
             spriteRenderer.flipX = false;
-        }
         else
-        {
             spriteRenderer.flipX = true;
-        }
     }
 
     private State DetermineState()
     {
-        if(state == State.Die)
-        {
-            return State.Spawn;
-        }
-        if (state == State.Roam && wayPointMover.currentWayPointIndex == 0 && canSeePlayer && player.lightTime > 0) 
+        if (state == State.Die || state == State.Spawn) return state;
+
+        // Ölüm: Başlangıç noktasındayken (0. waypoint) oyuncu ışık tutuyorsa
+        if (state == State.Roam && wayPointMover.currentWayPointIndex == 0 && canSeePlayer && player.lightTime > 0)
         {
             return State.Die;
         }
 
+        // Kaçma: Işık varsa
         if (distanceToPlayer < 10f && canSeePlayer && player.lightTime > 0)
         {
             return State.Flee;
         }
 
-        if (distanceToPlayer < 5f && canSeePlayer && enemy.canDash)
-        {
-            return State.Dash;
-        }
+        // Atılma, Takip ve Devriye
+        if (distanceToPlayer < 5f && canSeePlayer && enemy.canDash) return State.Dash;
+        if (distanceToPlayer < 10f && canSeePlayer) return State.Chase;
 
-        if (distanceToPlayer < 10f && canSeePlayer)
-        {
-            lastSeen = player.transform.position;
-            return State.Chase;
-        }
         return State.Roam;
     }
 
@@ -128,47 +114,38 @@ public class EnemyBehave : MonoBehaviour
     {
         if (exitingState == State.Flee)
         {
-            settingSprite = true; // Kaçma bitince sprite kontrolünü geri ver
+            settingSprite = true;
             wayPointMover.movementSpeed = originalSpeed;
         }
     }
-//Die ı düzenle
+
     private void HandleStateEnter(State enteringState)
     {
-        // Fizik ayarları
-        if (enteringState == State.Roam)
-        {
-            if (rb != null)
-            {
-                rb.linearVelocity = Vector2.zero;
-                rb.bodyType = RigidbodyType2D.Kinematic;
-            }
-        }
-        else if (enteringState == State.Chase || enteringState == State.Dash || enteringState == State.Flee)
-        {
-            if (rb != null)
-            {
-                rb.bodyType = RigidbodyType2D.Dynamic;
-                rb.WakeUp();
-            }
-        }
-
-        // State'e giriş anında bir kez yapılacak işlemler
         switch (enteringState)
         {
+            case State.Roam:
+                if (rb != null) { rb.linearVelocity = Vector2.zero; rb.bodyType = RigidbodyType2D.Kinematic; }
+                break;
+
+            case State.Chase:
+            case State.Dash:
             case State.Flee:
+                if (rb != null) { rb.bodyType = RigidbodyType2D.Dynamic; rb.WakeUp(); }
                 StartCoroutine(FleeProcess());
                 break;
+
             case State.Die:
-                if (gameObject.name == "Mother") animator.SetBool("Death", true);
                 StartCoroutine(KillObject());
+                break;
+
+            case State.Spawn:
+                StartCoroutine(SpawnProcess());
                 break;
         }
     }
 
     private void HandleStateAction(State currentState)
     {
-        // Varsayılan olarak hareketleri kapat, state içinde gerekirse aç
         enemy.canMove = false;
         wayPointMover.canMove = false;
 
@@ -192,58 +169,59 @@ public class EnemyBehave : MonoBehaviour
                 break;
 
             case State.Flee:
-                wayPointMover.canMove = true; // Kaçarken wayPointMover hareket eder
-                break;
-
-            case State.Spawn:
-                StartCoroutine(Spawn());
+                wayPointMover.canMove = true;
+                
                 break;
         }
     }
 
     IEnumerator FleeProcess()
     {
-        // Bir kez çalışacak kaçış mekaniği
         settingSprite = false;
-        
-        // Oyuncunun tersine bak
         spriteRenderer.flipX = (player.transform.position.x > transform.position.x);
-
-        // Geri gitme mantığı
         wayPointMover.currentWayPointIndex = Mathf.Max(0, wayPointMover.currentWayPointIndex - 3);
         if (wayPointMover.isWaiting) wayPointMover.isWaiting = false;
-        
-        wayPointMover.movementSpeed = 20f; // Hızlıca uzaklaş
+        wayPointMover.movementSpeed = 20f;
         wayPointMover.ResumeMovement();
-
-        yield return new WaitForSeconds(1.5f); // 1.5 saniye boyunca kaç
-
+        yield return new WaitForSeconds(1.5f);
         wayPointMover.movementSpeed = originalSpeed;
         settingSprite = true;
     }
 
     IEnumerator KillObject()
     {
-        // Animasyonun bitmesi için 1 saniye bekle ve sonra objeyi yok et/kapat
+        if (gameObject.name == "Mother") animator.SetBool("Death", true);
+
+        colliderEnemy.enabled = false;
+        wayPointMover.canMove = false;
+
         yield return new WaitForSeconds(1f);
-        animator.SetBool("Death" , true);
+
         spriteRenderer.enabled = false;
-        colliderEnemy.enabled = false;  
-        // Vector2 deathPosition = 
+
+        // Öldükten sonra Spawn sürecine geç
+        state = State.Spawn;
+        HandleStateEnter(State.Spawn);
     }
 
-    IEnumerator Spawn()
+    IEnumerator SpawnProcess()
     {
-        yield return new WaitForSeconds(5);
+        yield return new WaitForSeconds(5f);
+
+        if (spawnPoint != null) transform.position = spawnPoint.position;
+
+        if (gameObject.name == "Mother") animator.SetBool("Death", false);
         spriteRenderer.enabled = true;
         colliderEnemy.enabled = true;
+        wayPointMover.currentWayPointIndex = 0;
+
+        state = State.Roam;
     }
 
     private bool CheckSeesPlayer()
     {
         Vector2 direction = (player.transform.position - transform.position).normalized;
         RaycastHit2D hit = Physics2D.Raycast(transform.position, direction, 15f, visionMask);
-
         return hit.collider != null && hit.collider.CompareTag("Player");
     }
 }
