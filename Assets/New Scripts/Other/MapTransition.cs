@@ -141,7 +141,8 @@ public class MapTransition : MonoBehaviour
     public IEnumerator LockedDoor()
     {
         yield return new WaitForSeconds(5);
-        isPlayerInside = true;
+        int number = UnityEngine.Random.Range(0,4);
+        if (number == 0) isPlayerInside = true;
     }
 
     IEnumerator SeesDoor()
@@ -182,10 +183,6 @@ public class MapTransition : MonoBehaviour
             }
             else if (Input.GetMouseButtonDown(1))
             {
-                if (corridorBool)
-                {
-                    isPlayerInside = true;
-                }
                 if (lockedDoorCoroutine != null)
                 {
                     StopCoroutine(lockedDoorCoroutine);

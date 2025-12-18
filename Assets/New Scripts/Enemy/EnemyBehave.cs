@@ -10,6 +10,7 @@ enum State
     Dash,
     Flee,
     Die,
+    Spawn,
 }
 
 public class EnemyBehave : MonoBehaviour
@@ -94,32 +95,26 @@ public class EnemyBehave : MonoBehaviour
 
     private State DetermineState()
     {
-        // 1. Ölüm kontrolü (En öncelikli)
-        if (state == State.Roam && wayPointMover.currentWayPointIndex == 0 && wayPointMover.hasStartedPath) 
+        if (state == State.Roam && wayPointMover.currentWayPointIndex == 0 && canSeePlayer && player.lightTime > 0) 
         {
             return State.Die;
         }
 
-        // 2. Kaçma (Işık varsa)
         if (distanceToPlayer < 10f && canSeePlayer && player.lightTime > 0)
         {
             return State.Flee;
         }
 
-        // 3. Atılma (Yakınsa)
         if (distanceToPlayer < 5f && canSeePlayer && enemy.canDash)
         {
             return State.Dash;
         }
 
-        // 4. Takip
         if (distanceToPlayer < 10f && canSeePlayer)
         {
             lastSeen = player.transform.position;
             return State.Chase;
         }
-
-        // 5. Normal devriye
         return State.Roam;
     }
 
@@ -193,6 +188,10 @@ public class EnemyBehave : MonoBehaviour
             case State.Flee:
                 wayPointMover.canMove = true; // Kaçarken wayPointMover hareket eder
                 break;
+
+            case State.Spawn:
+                StartCoroutine(Spawn());
+                break;
         }
     }
 
@@ -221,7 +220,15 @@ public class EnemyBehave : MonoBehaviour
     {
         // Animasyonun bitmesi için 1 saniye bekle ve sonra objeyi yok et/kapat
         yield return new WaitForSeconds(1f);
-        gameObject.SetActive(false);
+        animator.SetBool("Death" , true);
+        // Vector2 deathPosition = 
+        state = State.Spawn;
+    }
+
+    IEnumerator Spawn()
+    {
+        yield return new WaitForSeconds(5);
+        gameObject.SetActive(true);
     }
 
     private bool CheckSeesPlayer()
