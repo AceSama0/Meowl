@@ -156,7 +156,6 @@ public class PuzzleSetSlots : MonoBehaviour
                     GameObject itemPrefab = itemDictionary.GetItemPrefab(itemComponent.ID);
                     if (itemPrefab != null) 
                     {
-                        
                         inventoryController.AddItem(itemPrefab);
                     }
                 }

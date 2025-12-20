@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 public class CineDeneme : MonoBehaviour
 {
     [SerializeField] Transform target, enemyTarget, enemyEscape;
-    [SerializeField] GameObject lantern, enemy, playerLantern, mouseIcon, lanternLight;
+    [SerializeField] GameObject lantern, enemy, playerLantern, mouseIcon, lanternLight, lanternObject;
     Animator animator;
     Player player;
     private const string IS_WALKING_PARAM = "isWalking";
@@ -59,13 +59,12 @@ public class CineDeneme : MonoBehaviour
 
         if (animator != null)
         {
-            animator.SetBool(IS_WALKING_PARAM, false);
-            animator.SetBool("RaiseLanternLeft", true);
+            Destroy(lanternObject);
+            animator.SetBool("LanternRaiseCS", true);
         }
         yield return new WaitForSeconds(1f);
         spriteRenderer.flipX = true;
         StartCoroutine(EnemyGettingCloser());
-        //animation
     }
 
     IEnumerator Failed()
@@ -85,14 +84,9 @@ public class CineDeneme : MonoBehaviour
     }
     IEnumerator Success()
     {
-        player.lightCount ++;
-        player.lightTime = 10f;
         Destroy(mouseIcon);
         SpriteRenderer enemySprite = enemy.GetComponent<SpriteRenderer>();
         enemySprite.flipX = true;
-        
-        playerLantern.SetActive(true);
-        Destroy(lantern);
         while (Vector2.Distance(enemy.transform.position, enemyEscape.position) > 0.1f)
         {
             enemy.transform.position = Vector2.MoveTowards(
@@ -104,22 +98,27 @@ public class CineDeneme : MonoBehaviour
             yield return null;
         }
         MusicManager.PlayBackgroundMusic(false);
-        
+
         SoundEffectManager.Play("deneme");
         Destroy(enemy);
         player.GetComponent<SpriteRenderer>().enabled = true;
-        player.animator.SetBool("LanternIdle" , true);
+        player.animator.SetBool("LanternIdle", true);
         player.animName = "LanternWalking";
-        
+
         player.lightfloat = 12f;
         player.enabled = true;
         player.transform.position = transform.position;
         player.canMove = true;
+        playerLantern.SetActive(true);
+        player.lightCount++;
+        player.lightTime = 10f;
+        yield return null;
+        Destroy(lantern);
         Destroy(gameObject);
 
     }
 
-    
+
 
     IEnumerator EnemyGettingCloser()
     {

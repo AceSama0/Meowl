@@ -35,7 +35,7 @@ public class SafeOpen : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     IEnumerator SuccessLockAnimation()
     {
         touchDedected = true;
-        // SoundEffectManager.Play("walking"); // Buraya kasa zımbırtısını döndürme gelecek
+        SoundEffectManager.Play("roll"); 
         animator.SetBool("open", true);
         yield return new WaitForSeconds(2);
         safePuzzleController.CheckPuzzleCompletion();

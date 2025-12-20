@@ -5,10 +5,10 @@ using UnityEngine.SceneManagement;
 
 public class Player : MonoBehaviour
 {
+    [SerializeField] GameObject GirlKill, FailedKill, MotherKill;
     bool idleing;
     private float footStepTimer;
     [SerializeField] float footStepDuration = 0.2f;
-    bool isPlayingFootSteps;
     public string animName = "isWalking";
     public bool canMove = true;
     public bool canRotate = true;
@@ -22,7 +22,6 @@ public class Player : MonoBehaviour
 
     [SerializeField] public float lightfloat = 0;
     [SerializeField] bool lightBool = true;
-    [SerializeField] bool switchHand;
     [SerializeField] Light2D lantern;
     public float lightTime = 0;
     public float lightCount = 1;
@@ -40,6 +39,14 @@ public class Player : MonoBehaviour
     private float qteStartTime;
     private float qteDuration = 1.0f;
     public bool success = false;
+    [Header("Daughter")]
+    [SerializeField] GameObject enemy;
+    Enemy enemyMove;
+    [SerializeField] WayPointMover wayPointMover;
+    EnemyBehave enemyBehave;
+    SpriteRenderer EspriteRenderer;
+    Collider2D enemyCollider;
+    DialogueStarter dialogueStarter;
 
     void Awake()
     {
@@ -54,12 +61,12 @@ public class Player : MonoBehaviour
         }
         basicSpeed = speed;
     }
-
-    void Start()
-    {
-    }
     void Update()
     {
+        if (inDialogue())
+        {
+            return;
+        }
         if (isQTEActive)
         {
             HandleQTEInput();
@@ -111,7 +118,7 @@ public class Player : MonoBehaviour
         }
 
 
-        if (Input.GetMouseButtonDown(1))
+        if (Input.GetMouseButtonDown(1))//&& lightCount > 0)
         {
 
             isQTEActive = false;
@@ -133,12 +140,30 @@ public class Player : MonoBehaviour
 
     private void OnQTESuccess()
     {
-        success = true;
+        wayPointMover.canMove = false;
+        enemyMove.canMove = false;
+        animator.SetBool("JumpedChild", false);
+        wayPointMover.currentWayPointIndex = 8;
+        enemy.transform.position = wayPointMover.wayPoints[7].position;
+        StartCoroutine(Spawn());
+    }
+
+    IEnumerator Spawn()
+    {
+        yield return new WaitForSeconds(10f);
+        enemyCollider.enabled = true;
+        wayPointMover.canMove = true;
+        enemyBehave.enabled = true;
+        EspriteRenderer.enabled = true;
+
     }
 
     private void OnQTEFailed()
     {
         success = false;
+        FailedKill.SetActive(true);
+        SoundEffectManager.Play("jumpScare");
+        Debug.Log("Failed");
     }
     void LightBehave()
     {
@@ -220,19 +245,77 @@ public class Player : MonoBehaviour
 
     void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.CompareTag("Fuel")) // yakıt
-        {
-            lightTime = 40f;
-            Debug.Log("Fenere yakıt eklendi");
-            lightCount++;
-            Destroy(collision.gameObject);
-        }
-
         if (collision.gameObject.CompareTag("Enemy"))
         {
-            MusicManager.PauseBackgroundMusic();
-            if (collision.gameObject.name == "Daughter") SceneManager.LoadScene("GirlKill");
-            if (collision.gameObject.name == "Mother") SceneManager.LoadScene("MotherKill");
+            if (collision.gameObject.name == "Daughter")
+            {
+                enemyBehave = collision.gameObject.GetComponent<EnemyBehave>();
+                enemyBehave.enabled = false;
+                enemyCollider = collision.gameObject.GetComponent<Collider2D>();
+                enemyCollider.enabled = false;
+                EspriteRenderer = collision.gameObject.GetComponent<SpriteRenderer>();
+                EspriteRenderer.enabled = false;
+                enemyMove = collision.gameObject.GetComponent<Enemy>();
+                float grabNumber = UnityEngine.Random.Range(0, 3);
+                if (grabNumber == 0)
+                {
+                    SoundEffectManager.Play("grab");
+                    animator.SetBool("JumpedChild", true);
+                    StartQTE(3);
+                }
+                else
+                {
+                    MusicManager.PauseBackgroundMusic();
+                    GirlKill.SetActive(true);
+                    SoundEffectManager.Play("jumpScare");
+                }
+
+            }
+            if (collision.gameObject.name == "Mother")
+            {
+                SoundEffectManager.Play("MotherKills");
+                MotherKill.SetActive(true);
+            }
+        }
+    }
+    void OnTriggerStay2D(Collider2D collision)
+    {
+        if (collision.gameObject.CompareTag("Dialogue"))
+        {
+            dialogueStarter = collision.gameObject.GetComponent<DialogueStarter>();
+            if (Input.GetKeyDown(KeyCode.E))
+            {
+
+                collision.gameObject.GetComponent<DialogueStarter>().ActivateDialogue();
+            }
+        }
+    }
+
+    void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.gameObject.CompareTag("Candle"))
+        {
+            Destroy(collision.gameObject);
+            Debug.Log("Fenere yakıt eklendi");
+            lightCount++;
+        }
+    }
+
+    void OnTriggerExit2D(Collider2D collision)
+    {
+        dialogueStarter = null;
+    }
+
+    private bool inDialogue()
+    {
+        if (dialogueStarter != null)
+        {
+            animator.SetBool(animName, false);
+            return dialogueStarter.DialogueActive();
+        }
+        else
+        {
+            return false;
         }
     }
 

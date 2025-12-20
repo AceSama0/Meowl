@@ -1,5 +1,4 @@
 using System.Collections;
-using Unity.VisualScripting;
 using UnityEngine;
 
 enum State
@@ -91,19 +90,21 @@ public class EnemyBehave : MonoBehaviour
     {
         if (state == State.Die || state == State.Spawn) return state;
 
-        // Ölüm: Başlangıç noktasındayken (0. waypoint) oyuncu ışık tutuyorsa
-        if (state == State.Roam && wayPointMover.currentWayPointIndex == 0 && canSeePlayer && player.lightTime > 0)
-        {
-            return State.Die;
-        }
-
-        // Kaçma: Işık varsa
+        
         if (distanceToPlayer < 10f && canSeePlayer && player.lightTime > 0)
         {
-            return State.Flee;
+            int number = UnityEngine.Random.Range(0, 3);
+            if (number <= 1)
+            {
+                return State.Die;
+            }
+            else
+            {
+                return State.Flee;
+            }
         }
 
-        // Atılma, Takip ve Devriye
+        
         if (distanceToPlayer < 5f && canSeePlayer && enemy.canDash) return State.Dash;
         if (distanceToPlayer < 10f && canSeePlayer) return State.Chase;
 
@@ -130,8 +131,8 @@ public class EnemyBehave : MonoBehaviour
             case State.Chase:
             case State.Dash:
             case State.Flee:
-                if (rb != null) { rb.bodyType = RigidbodyType2D.Dynamic; rb.WakeUp(); }
                 StartCoroutine(FleeProcess());
+                if (rb != null) { rb.bodyType = RigidbodyType2D.Dynamic; rb.WakeUp(); }
                 break;
 
             case State.Die:
@@ -170,7 +171,6 @@ public class EnemyBehave : MonoBehaviour
 
             case State.Flee:
                 wayPointMover.canMove = true;
-                
                 break;
         }
     }
@@ -178,7 +178,7 @@ public class EnemyBehave : MonoBehaviour
     IEnumerator FleeProcess()
     {
         settingSprite = false;
-        spriteRenderer.flipX = (player.transform.position.x > transform.position.x);
+        spriteRenderer.flipX = (player.transform.position.x > transform.position.x && !enemy.isDashing);
         wayPointMover.currentWayPointIndex = Mathf.Max(0, wayPointMover.currentWayPointIndex - 3);
         if (wayPointMover.isWaiting) wayPointMover.isWaiting = false;
         wayPointMover.movementSpeed = 20f;
@@ -190,31 +190,38 @@ public class EnemyBehave : MonoBehaviour
 
     IEnumerator KillObject()
     {
-        if (gameObject.name == "Mother") animator.SetBool("Death", true);
-
-        colliderEnemy.enabled = false;
+        enemy.canMove = false;
         wayPointMover.canMove = false;
-
-        yield return new WaitForSeconds(1f);
-
+        animator.SetBool("Death", true);
+        colliderEnemy.enabled = false;
+        yield return new WaitForSeconds(2f);
         spriteRenderer.enabled = false;
-
-        // Öldükten sonra Spawn sürecine geç
         state = State.Spawn;
         HandleStateEnter(State.Spawn);
     }
 
     IEnumerator SpawnProcess()
     {
-        yield return new WaitForSeconds(5f);
-
-        if (spawnPoint != null) transform.position = spawnPoint.position;
-
-        if (gameObject.name == "Mother") animator.SetBool("Death", false);
+        if (player.transform.position.x < transform.position.x && gameObject.name == "Mother")
+        {
+            transform.position = wayPointMover.wayPoints[7].position;
+            wayPointMover.currentWayPointIndex = 8;
+        }
+        else if(player.transform.position.x > transform.position.x && gameObject.name == "Mother")
+        {
+            transform.position = wayPointMover.wayPoints[0].position;
+            wayPointMover.currentWayPointIndex = 0;
+        }
+        else if (gameObject.name == "Daughter")
+        {
+            transform.position = wayPointMover.wayPoints[7].position;
+            wayPointMover.currentWayPointIndex = 8;
+        }
+        yield return new WaitForSeconds(10f);
+        
+        animator.SetBool("Death", false);
         spriteRenderer.enabled = true;
         colliderEnemy.enabled = true;
-        wayPointMover.currentWayPointIndex = 0;
-
         state = State.Roam;
     }
 

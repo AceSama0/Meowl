@@ -12,7 +12,7 @@ public class PuzzleControlerActivater : MonoBehaviour
     {
         if (collision.CompareTag("Player"))
         {
-            puzzleController.SetActive(true);
+            if(puzzleController != null) puzzleController.SetActive(true);
         }
     }
     

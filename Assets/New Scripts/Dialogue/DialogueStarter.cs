@@ -3,34 +3,29 @@ using UnityEngine;
 public class DialogueStarter : MonoBehaviour
 {
     [SerializeField] GameObject dialogue;
-    Player player;
-
-    void Awake()
+    bool wasActive = false;
+    public void ActivateDialogue()
     {
-        player = FindAnyObjectByType<Player>();
+        dialogue.SetActive(true);
     }
 
-    void OnTriggerStay2D(Collider2D collision)
+    public bool DialogueActive()
     {
-        if (collision.gameObject.CompareTag("Player"))
-        {
-            player.canMove = false;
-            dialogue.SetActive(true);
-        }
-    }
-
-    void OnTriggerExit2D(Collider2D collision)
-    {
-        player.canMove = true;
-        Destroy(gameObject);
+        return dialogue.activeInHierarchy;
     }
 
     void Update()
     {
-        if (!dialogue.activeInHierarchy)
+        
+        if (dialogue.activeInHierarchy)
         {
-            player.canMove = true;
-            
+            wasActive = true;
+        }
+
+        
+        if (wasActive && !dialogue.activeInHierarchy)
+        {
+            Destroy(gameObject);
         }
     }
 }

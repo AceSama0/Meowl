@@ -27,7 +27,7 @@ public class ItemDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
 
         canvasGroup.blocksRaycasts = false;
         canvasGroup.alpha = 0.6f;
-        SoundEffectManager.Play("HoldingMirror");
+        SoundEffectManager.Play("PickUp");
     }
 
     public void OnDrag(PointerEventData eventData)
@@ -39,7 +39,7 @@ public class ItemDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
     {
         canvasGroup.blocksRaycasts = true;
         canvasGroup.alpha = 1f;
-
+        SoundEffectManager.Play("PutDown");
         SlotScripts dropSlot = null;
 
         if (eventData.pointerEnter != null)
@@ -90,6 +90,7 @@ public class ItemDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
 
                 transform.SetParent(dropSlot.transform);
                 dropSlot.currentImage = gameObject;
+                
                 Debug.Log($"YENİ YERLEŞTIRME: {dropSlot.name} artık {gameObject.name} içeriyor"); // DEBUG
                 FitItemToSlot();
             }

@@ -1,10 +1,10 @@
 using UnityEngine;
-using UnityEngine.EventSystems;
 
 public class SafePuzzleController : MonoBehaviour 
 {
     [SerializeField] Lock[] locks;
-    [SerializeField] GameObject puzzleUI;
+    [SerializeField] GameObject puzzleUI, livingKey;
+    [SerializeField] MapTransition mapTransition;
     SafeOpen safeOpen;
     public bool IsPuzzleCompleted { get; private set; }
     void Awake()
@@ -45,6 +45,8 @@ public class SafePuzzleController : MonoBehaviour
         IsPuzzleCompleted = true;  
         SoundEffectManager.Play("success");
         Debug.Log("Kasa Şifresi Bulundu");
+        mapTransition.doorCanOpen = true;
+        livingKey.SetActive(true);
         Destroy(puzzleUI);     
     }
     private void FailedMainPuzzle()
@@ -53,6 +55,4 @@ public class SafePuzzleController : MonoBehaviour
         SoundEffectManager.Play("failed");  
         Debug.Log("Kasa Şifresi Bulunamadı");
     }
-
-    
 }

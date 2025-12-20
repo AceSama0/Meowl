@@ -1,13 +1,14 @@
-using System.Collections;
+
 using UnityEngine;
+
 
 public class PuzzleController : MonoBehaviour
 {
     [SerializeField] private SlotScripts[] allPuzzleSlots;
     Player player;
-    [SerializeField] GameObject puzzle,finalHint;
-
+    [SerializeField] GameObject puzzle, finalHint;
     private InventoryScript inventoryScript;
+    [SerializeField] GameObject toyPieces;
     void Awake()
     {
         inventoryScript = FindAnyObjectByType<InventoryScript>();
@@ -30,20 +31,25 @@ public class PuzzleController : MonoBehaviour
             }
         }
 
-        if (isPuzzleSolved)
+        if (isPuzzleSolved) // puzzleÇözüldü
         {
 
             if (puzzle != null)
             {
                 SoundEffectManager.Play("success");
                 inventoryScript.isAnotherScreenOpened = false;
-                player.canMove = true;
-                Destroy(puzzle);
                 if (finalHint != null)
                 {
-                    finalHint.SetActive(true);
+                    Destroy(puzzle);
+                    finalHint.SetActive(true); 
+                    if(toyPieces != null)
+                    {
+                        toyPieces.SetActive(true);
+                    }
                 }
+                player.canMove = true;
             }
+            if (puzzle != null) Destroy(puzzle);
             Destroy(gameObject);
         }
     }

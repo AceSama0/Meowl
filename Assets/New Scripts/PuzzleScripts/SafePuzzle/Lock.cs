@@ -22,7 +22,7 @@ public class Lock : MonoBehaviour, IPointerClickHandler
     public void OnPointerClick(PointerEventData eventData)
     {
         StartCoroutine(changeAnimaton());
-        SoundEffectManager.Play("walking");
+        SoundEffectManager.Play("rollingNumbers");
         
     }
 

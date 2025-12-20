@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 2914849231761022421}
   - component: {fileID: 8455671958616158095}
   - component: {fileID: 1311770557162815225}
-  - component: {fileID: 7315425963342343119}
   m_Layer: 11
   m_Name: LetterPrefab
   m_TagString: Untagged
@@ -154,49 +153,4 @@ MonoBehaviour:
   LetterButton: {fileID: 0}
   newSprite: {fileID: -6902027929315493807, guid: be44893eb9fd45b4c80e92a24231784a, type: 3}
   imageButtonSprite: {fileID: 8957324059118975939, guid: a87ef85efd7b2ea4ba9855376432e451, type: 3}
---- !u!61 &7315425963342343119
-BoxCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3638057354242694110}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_ForceSendLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ForceReceiveLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ContactCaptureLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_CallbackLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_IsTrigger: 0
-  m_UsedByEffector: 0
-  m_CompositeOperation: 0
-  m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 1, y: 1}
-    newSize: {x: 1, y: 1}
-    adaptiveTilingThreshold: 0.5
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
-  m_Size: {x: 1, y: 1}
-  m_EdgeRadius: 0
+  keyObject: {fileID: 0}

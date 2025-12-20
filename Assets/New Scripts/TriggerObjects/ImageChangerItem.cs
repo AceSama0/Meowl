@@ -9,6 +9,7 @@ public class ImageChangerItem : MonoBehaviour
     PlayerInteract playerInteract;
     [SerializeField] Image LetterRead, LetterText, LetterButton;
     [SerializeField] Sprite newSprite, imageButtonSprite;
+    [SerializeField] GameObject keyObject;
     void Awake()
     {
         playerInteract = FindAnyObjectByType<PlayerInteract>();
@@ -20,6 +21,7 @@ public class ImageChangerItem : MonoBehaviour
         if (collision.gameObject.CompareTag("Player"))
         {
             isPlayerNear = true;
+            keyObject.SetActive(true);
         }
     }
     void OnTriggerExit2D(Collider2D collision)
@@ -31,17 +33,18 @@ public class ImageChangerItem : MonoBehaviour
     {
         if (isPlayerNear && playerInteract.interacting)
         {
+            SoundEffectManager.Play("OpenPaper");
             LetterRead.sprite = newSprite;
             LetterText.sprite = newSprite;
             panel.SetActive(true);
             LetterButton.sprite = imageButtonSprite;
         }
 
-        if (Input.GetMouseButtonDown(1))
+        if (Input.GetMouseButtonDown(0) && isPlayerNear && gameObject.activeInHierarchy)
         {
+            SoundEffectManager.Play("ClosePaper");
             panel.SetActive(false);
             Destroy(gameObject);
-
         }
     }
 }

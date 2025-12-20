@@ -11,7 +11,11 @@ PrefabInstance:
     - target: {fileID: -7017799229639811435, guid: ba3530899fe63464380d490e7fd1033c, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 6851063822677676398, guid: 32726eef68207514bbede9c6509379b5, type: 3}
+      objectReference: {fileID: 1089073539438807488, guid: ab6ae5a7f89c4154c9d3394409c991b3, type: 3}
+    - target: {fileID: -3380552589626630339, guid: ba3530899fe63464380d490e7fd1033c, type: 3}
+      propertyPath: ID
+      value: 9
+      objectReference: {fileID: 0}
     - target: {fileID: -3380552589626630339, guid: ba3530899fe63464380d490e7fd1033c, type: 3}
       propertyPath: Name
       value: Mirror4
@@ -23,7 +27,7 @@ PrefabInstance:
     - target: {fileID: 4203920330175119533, guid: ba3530899fe63464380d490e7fd1033c, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 6851063822677676398, guid: 32726eef68207514bbede9c6509379b5, type: 3}
+      objectReference: {fileID: 1089073539438807488, guid: ab6ae5a7f89c4154c9d3394409c991b3, type: 3}
     - target: {fileID: 7940251415578400867, guid: ba3530899fe63464380d490e7fd1033c, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5

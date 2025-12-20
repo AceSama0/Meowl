@@ -4,11 +4,13 @@ using UnityEngine;
 
 public class MapTransition : MonoBehaviour
 {
+    public bool doorCanOpen = true;
     [SerializeField] MapTransition previousMapTransition;
     public Coroutine lockedDoorCoroutine;
     [SerializeField] Enemy enemy;
     bool isEnemyInside = false;
     Player player;
+
     DoorKnob doorKnob;
     [SerializeField] GameObject door;
     WayPointMover wayPointMover;
@@ -71,7 +73,12 @@ public class MapTransition : MonoBehaviour
 
     private void HandlePlayerEnter()
     {
-
+        if (!doorCanOpen)
+        {
+            SoundEffectManager.Play("Locked");
+            Debug.Log("Kapı kilitli, geçiş yapılamaz.");
+            return;
+        }
         if (previousMapTransition != null)
         {
             if (previousMapTransition.lockedDoorCoroutine != null)
@@ -106,7 +113,14 @@ public class MapTransition : MonoBehaviour
             StartCoroutine(TryOpeningDoor());
         }
     }
-
+    IEnumerator FootSteps()
+    {
+        for (int i = 0; i < 4; i++)
+        {
+            yield return new WaitForSeconds(0.2f);
+            FootStepSound();
+        }
+    }
     IEnumerator TryOpeningDoor()
     {
 
@@ -141,8 +155,9 @@ public class MapTransition : MonoBehaviour
     public IEnumerator LockedDoor()
     {
         yield return new WaitForSeconds(5);
-        int number = UnityEngine.Random.Range(0,4);
+        int number = UnityEngine.Random.Range(0, 4);
         if (number == 0) isPlayerInside = true;
+        if (isPlayerInside) SoundEffectManager.Play("DoorLocked");
     }
 
     IEnumerator SeesDoor()
@@ -175,7 +190,12 @@ public class MapTransition : MonoBehaviour
 
                 UpdatePlayerPosition(player.gameObject);
                 StartCoroutine(TransitionEffect());
-                if (!soundPlayed) SoundEffectManager.Play("door");
+                // if (!soundPlayed && Animation.name == "DoorTransition") SoundEffectManager.Play("door");
+                // else if (!soundPlayed && Animation.name == "Stairs")
+                // {
+                //     StartCoroutine(FootSteps());
+                // }
+
                 soundPlayed = true;
                 StartCoroutine(CutSceneShower());
 
@@ -209,11 +229,20 @@ public class MapTransition : MonoBehaviour
 
     }
 
+    void FootStepSound()
+    {
+        SoundEffectManager.Play("walking");
+    }
+
     IEnumerator TransitionEffect()
     {
         player.canMove = false;
         Animation.SetActive(true);
-        SoundEffectManager.Play("door");
+        if(Animation.name == "DoorTransition") SoundEffectManager.Play("door");
+        else if (!soundPlayed && Animation.name == "Stairs")
+        {
+            StartCoroutine(FootSteps());
+        }
 
         yield return new WaitForSeconds(1);
 

@@ -2,33 +2,34 @@ using UnityEngine;
 
 public class StepPuzzle : MonoBehaviour
 {
-    
+
     [SerializeField] BreakingWood[] allWoodPieces;
-    
-    
+    [SerializeField] AudioClip easterEggMusic;
+
+
     public bool IsPuzzleCompleted { get; private set; } = false;
 
     void Start()
     {
         Debug.Log($"Toplam {allWoodPieces.Length} adet odun parçası bulundu.");
-        
+
         if (allWoodPieces.Length != 5)
         {
-             Debug.LogWarning("Bulmaca için beklenen 5 odun parçası bulunamadı. Kontrol edin.");
+            Debug.LogWarning("Bulmaca için beklenen 5 odun parçası bulunamadı. Kontrol edin.");
         }
     }
 
-    
+
     public void CheckPuzzleCompletion()
     {
         if (IsPuzzleCompleted)
         {
-            return; 
+            return;
         }
-        
+
         int completedCount = 0;
-        
-        
+
+
         foreach (BreakingWood woodPiece in allWoodPieces)
         {
             if (woodPiece.success)
@@ -37,7 +38,7 @@ public class StepPuzzle : MonoBehaviour
             }
         }
 
-        
+
         if (completedCount == allWoodPieces.Length)
         {
             SolveMainPuzzle();
@@ -46,6 +47,7 @@ public class StepPuzzle : MonoBehaviour
 
     private void SolveMainPuzzle()
     {
-        IsPuzzleCompleted = true;  
+        IsPuzzleCompleted = true;
+        MusicManager.PlayBackgroundMusic(false, easterEggMusic);
     }
 }

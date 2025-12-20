@@ -25,9 +25,7 @@ public class PuzzleActivate2 : MonoBehaviour
             {
                 PuzzleName.SetActive(true);
             }
-            player.canMove = false;
-            puzzleOpened = true;
-            
+            puzzleOpened = true;    
         }
     }
     void OnTriggerExit2D(Collider2D collision)
