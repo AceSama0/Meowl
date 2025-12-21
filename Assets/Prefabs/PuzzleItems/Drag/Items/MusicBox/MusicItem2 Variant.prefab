@@ -95,7 +95,7 @@ PrefabInstance:
     - target: {fileID: 6451613634224583748, guid: 8f04124fd6cd74c449fd15c940c51d67, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: -8166746417374445508, guid: cbc3de93d8c073148bfa4e9b375fe7f7, type: 3}
+      objectReference: {fileID: -5498155053002960970, guid: 4f39035745f101e4798670b7c2f3f048, type: 3}
     - target: {fileID: 7907408546001861654, guid: 8f04124fd6cd74c449fd15c940c51d67, type: 3}
       propertyPath: m_Name
       value: MusicItem2 Variant
@@ -103,7 +103,7 @@ PrefabInstance:
     - target: {fileID: 9026387824771558012, guid: 8f04124fd6cd74c449fd15c940c51d67, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: -8166746417374445508, guid: cbc3de93d8c073148bfa4e9b375fe7f7, type: 3}
+      objectReference: {fileID: -5498155053002960970, guid: 4f39035745f101e4798670b7c2f3f048, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

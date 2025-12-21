@@ -16,13 +16,14 @@ public class ToyCutScene : MonoBehaviour
     void Start()
     {
         playerSC = player.GetComponent<Player>();
+        playerSC.canMove = false;
         animator = GetComponent<Animator>();
         StartCoroutine(StartCutScene());
     }
     // Beklemeleri ayarla 
     IEnumerator StartCutScene()
     {
-        playerSC.enabled = false;
+        
         player.SetActive(false);
         SoundEffectManager.Play("door");
         yield return new WaitForSeconds(1);
@@ -45,13 +46,13 @@ public class ToyCutScene : MonoBehaviour
         SoundEffectManager.Play("door");
         enemy.SetActive(false);
         player.SetActive(true);
-        playerSC.enabled = true;
-        playerSC.animator.SetBool("Walk", false);
+        playerSC.canMove = true;
+        player.transform.position = transform.position;
+        playerSC.animator.SetBool("isWalking", false);
         yield return null;
-        playerSC.animator.SetBool("LanternIdle" , true);
+        playerSC.animator.CrossFade("LanternIdle", 0.1f);
         yield return null;
         playerSC.animName = "LanternWalking";
-        player.transform.position = transform.position;
         Destroy(enemies);
         NextCutScene.SetActive(true);
         Destroy(gameObject);

@@ -8,6 +8,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 938815398909135440, guid: b4c28411d10938b47abd222f728d9098, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: -1501372917481117430, guid: ed955e7a3b5e2d4478b86baef615be76, type: 3}
+    - target: {fileID: 3011712077846533224, guid: b4c28411d10938b47abd222f728d9098, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: -1501372917481117430, guid: ed955e7a3b5e2d4478b86baef615be76, type: 3}
     - target: {fileID: 4121684160114098690, guid: b4c28411d10938b47abd222f728d9098, type: 3}
       propertyPath: m_Name
       value: MusicItem5 Variant

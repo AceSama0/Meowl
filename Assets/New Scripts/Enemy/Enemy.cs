@@ -13,7 +13,7 @@ public class Enemy : MonoBehaviour
 
     [Header("Dash")]
     public bool canDash = true;
-    [SerializeField]public bool isDashing;
+    [SerializeField] public bool isDashing;
     [SerializeField] float dashingDuration = 0.1f;
     [SerializeField] float dashingSpeed;
     [SerializeField] float dashCoolDown = 0.1f;
@@ -33,26 +33,26 @@ public class Enemy : MonoBehaviour
 
     void Update()
     {
-        if (!canMove)
+        if (canMove)
         {
-            return;
+            if (isDashing)
+            {
+                animator.SetBool("Jump", true);
+                return;
+            }
+            if (target)
+            {
+                animator.SetBool("Jump", false);
+                Vector3 direction = (target.transform.position - transform.position).normalized;
+                moveDirection = direction;
+            }
+            if (Vector2.Distance(target.position, transform.position) < 10f && canDash && gameObject.name == "Daughter")
+            {
+                StartCoroutine(Dash());
+            }
         }
 
-        if (isDashing)
-        {
-            animator.SetBool("Jump" , true);
-            return;
-        }
-        if (target)
-        {
-            animator.SetBool("Jump" , false);
-            Vector3 direction = (target.transform.position - transform.position).normalized;
-            moveDirection = direction;
-        }
-        if (Vector2.Distance(target.position, transform.position) < 10f && canDash && gameObject.name == "Daughter")
-        {
-            StartCoroutine(Dash());
-        }
+
     }
     void FixedUpdate()
     {
@@ -72,13 +72,13 @@ public class Enemy : MonoBehaviour
     IEnumerator Dash()
     {
         canDash = false;
-        if(gameObject.name == "Daughter") animator.SetBool("Jump" , true);
+        if (gameObject.name == "Daughter") animator.SetBool("Jump", true);
         isDashing = true;
         rb.linearVelocity = new Vector2(moveDirection.x, moveDirection.y) * dashingSpeed;
         yield return new WaitForSeconds(dashingDuration);
         isDashing = false;
         yield return new WaitForSeconds(dashCoolDown);
-        if(gameObject.name == "Daughter") animator.SetBool("Jump" , false);
-        
+        if (gameObject.name == "Daughter") animator.SetBool("Jump", false);
+
     }
 }

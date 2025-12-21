@@ -9,6 +9,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 273959324247690003, guid: 8d51a22c846937149b28ea92d32d13c5, type: 3}
+      propertyPath: ID
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 273959324247690003, guid: 8d51a22c846937149b28ea92d32d13c5, type: 3}
       propertyPath: Name
       value: LeftFoot
       objectReference: {fileID: 0}
@@ -95,11 +99,11 @@ PrefabInstance:
     - target: {fileID: 5495329502868835003, guid: 8d51a22c846937149b28ea92d32d13c5, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 6368797455540986058, guid: ce4f6d0583fb17c4d8472e45f0f78b2f, type: 3}
+      objectReference: {fileID: 8333121710447817129, guid: 6d5f5918af662e64e8cbf07ab523e0e2, type: 3}
     - target: {fileID: 7534454682024285315, guid: 8d51a22c846937149b28ea92d32d13c5, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 6368797455540986058, guid: ce4f6d0583fb17c4d8472e45f0f78b2f, type: 3}
+      objectReference: {fileID: 8333121710447817129, guid: 6d5f5918af662e64e8cbf07ab523e0e2, type: 3}
     - target: {fileID: 8680454460656927465, guid: 8d51a22c846937149b28ea92d32d13c5, type: 3}
       propertyPath: m_Name
       value: ToyLeftFood Variant

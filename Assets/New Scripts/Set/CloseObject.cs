@@ -12,6 +12,7 @@ public class CloseObject : MonoBehaviour
     {
         if(Input.GetMouseButtonDown(0))
         {
+            
             Destroy(gameObject);
         }
     }

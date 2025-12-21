@@ -11,7 +11,11 @@ PrefabInstance:
     - target: {fileID: -7017799229639811435, guid: ba3530899fe63464380d490e7fd1033c, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: -6056288166947438962, guid: 159987fa900304b4a985e823c97da93d, type: 3}
+      objectReference: {fileID: -4734212509257289508, guid: 9b7df6e4c0a8b26448bf173bd16f376b, type: 3}
+    - target: {fileID: -3380552589626630339, guid: ba3530899fe63464380d490e7fd1033c, type: 3}
+      propertyPath: ID
+      value: 18
+      objectReference: {fileID: 0}
     - target: {fileID: -3380552589626630339, guid: ba3530899fe63464380d490e7fd1033c, type: 3}
       propertyPath: Name
       value: LeftHand
@@ -23,7 +27,7 @@ PrefabInstance:
     - target: {fileID: 4203920330175119533, guid: ba3530899fe63464380d490e7fd1033c, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: -6056288166947438962, guid: 159987fa900304b4a985e823c97da93d, type: 3}
+      objectReference: {fileID: -4734212509257289508, guid: 9b7df6e4c0a8b26448bf173bd16f376b, type: 3}
     - target: {fileID: 7940251415578400867, guid: ba3530899fe63464380d490e7fd1033c, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5

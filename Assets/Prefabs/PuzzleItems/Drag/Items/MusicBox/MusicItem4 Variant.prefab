@@ -95,11 +95,11 @@ PrefabInstance:
     - target: {fileID: 5315083462478850731, guid: 2907cc7dd5f1bda42b50d841ea353686, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 5222327376163656147, guid: 8123182af98fb8147a7d6e6bf458ba4b, type: 3}
+      objectReference: {fileID: 4168573275084842802, guid: 1636f41b7c4531240bc110dcb5d4ca15, type: 3}
     - target: {fileID: 7858341217232516243, guid: 2907cc7dd5f1bda42b50d841ea353686, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 5222327376163656147, guid: 8123182af98fb8147a7d6e6bf458ba4b, type: 3}
+      objectReference: {fileID: 4168573275084842802, guid: 1636f41b7c4531240bc110dcb5d4ca15, type: 3}
     - target: {fileID: 9076589956797506297, guid: 2907cc7dd5f1bda42b50d841ea353686, type: 3}
       propertyPath: m_Name
       value: MusicItem4 Variant

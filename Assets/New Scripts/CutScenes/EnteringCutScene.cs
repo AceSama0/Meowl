@@ -5,6 +5,7 @@ using UnityEngine;
 public class EnteringCutScene : MonoBehaviour
 {
     [SerializeField] Transform cameraFollow, cameraTarget, cameraTarget1, cameraTarget2, playerTransform;
+    [SerializeField] GameObject dialogue;
     Player player;
     [SerializeField] float speed = 0.5f;
     private CinemachineCamera vCam;
@@ -40,8 +41,9 @@ public class EnteringCutScene : MonoBehaviour
 
         yield return new WaitForSeconds(2);
 
-        SoundEffectManager.Play("door");
-
+        // SoundEffectManager.Play("door");
+        dialogue.SetActive(true);
+        yield return new WaitForSeconds(2);
         vCam.Follow = playerTransform;
         player.canMove = true;
         player.canRotate = true;

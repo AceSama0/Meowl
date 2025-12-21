@@ -9,6 +9,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 2170981292457253740, guid: 95933bfe1fcbea44297229c6fd17f922, type: 3}
+      propertyPath: ID
+      value: 22
+      objectReference: {fileID: 0}
+    - target: {fileID: 2170981292457253740, guid: 95933bfe1fcbea44297229c6fd17f922, type: 3}
       propertyPath: Name
       value: Head
       objectReference: {fileID: 0}
@@ -95,7 +99,7 @@ PrefabInstance:
     - target: {fileID: 5885859910253992644, guid: 95933bfe1fcbea44297229c6fd17f922, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: -1192088174366324351, guid: 7af5f1575a7e5934ca159b01483ce258, type: 3}
+      objectReference: {fileID: 5374673012164036456, guid: 78354504ea186f143a56508d8f98ecd5, type: 3}
     - target: {fileID: 7321366596825846422, guid: 95933bfe1fcbea44297229c6fd17f922, type: 3}
       propertyPath: m_Name
       value: ToyHead Variant
@@ -103,7 +107,7 @@ PrefabInstance:
     - target: {fileID: 8458413121257096444, guid: 95933bfe1fcbea44297229c6fd17f922, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: -1192088174366324351, guid: 7af5f1575a7e5934ca159b01483ce258, type: 3}
+      objectReference: {fileID: 5374673012164036456, guid: 78354504ea186f143a56508d8f98ecd5, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
