@@ -29,6 +29,7 @@ public class FinalCutScene : MonoBehaviour
     {
         if (isDialogueActivated && !Dialogue1.activeInHierarchy)
         {
+            isDialogueActivated = false;
             Rotoscope1.SetActive(true);
             MusicManager.PlayBackgroundMusic(false, rotoscopeSounds);
         }
