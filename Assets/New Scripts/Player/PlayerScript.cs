@@ -21,7 +21,6 @@ public class Player : MonoBehaviour
     [SerializeField] int lightWPIndex = 3;
 
     [SerializeField] public float lightfloat = 0;
-    [SerializeField] bool lightBool = true;
     [SerializeField] Light2D lantern;
     public float lightTime = 0;
     public float lightCount = 1;

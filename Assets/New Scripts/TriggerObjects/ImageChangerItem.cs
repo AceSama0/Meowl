@@ -21,7 +21,7 @@ public class ImageChangerItem : MonoBehaviour
         if (collision.gameObject.CompareTag("Player"))
         {
             isPlayerNear = true;
-            keyObject.SetActive(true);
+            if (keyObject != null) keyObject.SetActive(true);
         }
     }
     void OnTriggerExit2D(Collider2D collision)

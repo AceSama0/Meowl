@@ -8,7 +8,6 @@ public class MapTransition : MonoBehaviour
     [SerializeField] MapTransition previousMapTransition;
     public Coroutine lockedDoorCoroutine;
     [SerializeField] Enemy enemy;
-    bool isEnemyInside = false;
     Player player;
 
     DoorKnob doorKnob;
@@ -101,12 +100,6 @@ public class MapTransition : MonoBehaviour
             UpdatePlayerPosition(collision.gameObject);
             if (!soundPlayed && corridorBool) SoundEffectManager.Play("door");
             soundPlayed = true;
-            isEnemyInside = true;
-
-            if (previousMapTransition != null)
-            {
-                previousMapTransition.isEnemyInside = false;
-            }
         }
         else if (isPlayerInside)
         {
